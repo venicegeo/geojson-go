@@ -18,29 +18,17 @@ package geojson
 
 import "encoding/json"
 
-// COORDINATES is GeoJSON coordinates
-const COORDINATES = "coordinates"
-
-// POINT is a GeoJSON Point
-const POINT = "Point"
-
-// LINESTRING is a GeoJSON LineString
-const LINESTRING = "LineString"
-
-// POLYGON is a GeoJSON Polygon
-const POLYGON = "Polygon"
-
-// MULTIPOINT is a GeoJSON MultiPoint
-const MULTIPOINT = "MultiPoint"
-
-// MULTILINESTRING is a GeoJSON MultiLineString
-const MULTILINESTRING = "MultiLineString"
-
-// MULTIPOLYGON is a GeoJSON MultiPolygon
-const MULTIPOLYGON = "MultiPolygon"
-
-// GEOMETRYCOLLECTION is a GeoJSON GeometryCollection
-const GEOMETRYCOLLECTION = "GeometryCollection"
+// GeoJSON Constants
+const (
+	COORDINATES        = "coordinates"
+	POINT              = "Point"
+	LINESTRING         = "LineString"
+	POLYGON            = "Polygon"
+	MULTIPOINT         = "MultiPoint"
+	MULTILINESTRING    = "MultiLineString"
+	MULTIPOLYGON       = "MultiPolygon"
+	GEOMETRYCOLLECTION = "GeometryCollection"
+)
 
 // The Point object contains a single position
 type Point struct {

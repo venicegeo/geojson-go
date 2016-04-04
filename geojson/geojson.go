@@ -18,55 +18,9 @@ package geojson
 
 import "encoding/json"
 
-// FEATURE is a GeoJSON Feature
-const FEATURE = "Feature"
-
-// FEATURECOLLECTION is a GeoJSON FeatureCollection
-const FEATURECOLLECTION = "FeatureCollection"
-
 // The GeoJSON object represents a geometry, feature, or collection of features.
 type GeoJSON struct {
 	Type string `json:"type"`
-}
-
-// The Feature object represents an array of features
-type Feature struct {
-	Type       string                 `json:"type"`
-	Geometry   interface{}            `json:"geometry"`
-	Properties map[string]interface{} `json:"properties"`
-	ID         string                 `json:"id, omitempty"`
-	// Bbox     Bbox     `json:"bbox, omitempty"`
-}
-
-// NewFeature constructs a Feature from a GeoJSON byte array
-func NewFeature(bytes []byte) (Feature, error) {
-	var result Feature
-	err := json.Unmarshal(bytes, &result)
-	result.resolveGeometry()
-	return result, err
-}
-
-// Since unmarshaled objects don't come back as real geometries,
-// This method reconstructs them
-func (feature *Feature) resolveGeometry() {
-	feature.Geometry = NewGeometry(feature.Geometry.(map[string]interface{}))
-}
-
-// The FeatureCollection object represents an array of features
-type FeatureCollection struct {
-	Type     string    `json:"type"`
-	Features []Feature `json:"features"`
-	//	Bbox     Bbox      `json:"bbox, omitempty"`
-}
-
-// NewFeatureCollection constructs a FeatureCollection from a GeoJSON byte array
-func NewFeatureCollection(bytes []byte) (FeatureCollection, error) {
-	var result FeatureCollection
-	err := json.Unmarshal(bytes, &result)
-	for inx := 0; inx < len(result.Features); inx++ {
-		result.Features[inx].resolveGeometry()
-	}
-	return result, err
 }
 
 // Parse parses a GeoJSON string into a GeoJSON object
