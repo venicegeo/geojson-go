@@ -37,11 +37,16 @@ type Point struct {
 	// Bbox     Bbox     `json:"bbox, omitempty"`
 }
 
-// NewPoint constructs a point from a GeoJSON byte array
-func NewPoint(bytes []byte) (Point, error) {
+// PointFromBytes constructs a point from a GeoJSON byte array
+func PointFromBytes(bytes []byte) (Point, error) {
 	var result Point
 	err := json.Unmarshal(bytes, &result)
 	return result, err
+}
+
+// NewPoint is the normal factory method for a Point
+func NewPoint(coordinates []float64) *Point {
+	return &Point{Type: POINT, Coordinates: coordinates}
 }
 
 // The LineString object contains a array of two or more positions
@@ -51,11 +56,16 @@ type LineString struct {
 	// Bbox     Bbox     `json:"bbox, omitempty"`
 }
 
-// NewLineString constructs a LineString from a GeoJSON byte array
-func NewLineString(bytes []byte) (LineString, error) {
+// LineStringFromBytes constructs a LineString from a GeoJSON byte array
+func LineStringFromBytes(bytes []byte) (LineString, error) {
 	var result LineString
 	err := json.Unmarshal(bytes, &result)
 	return result, err
+}
+
+// NewLineString is the normal factory method for a LineString
+func NewLineString(coordinates [][]float64) *LineString {
+	return &LineString{Type: LINESTRING, Coordinates: coordinates}
 }
 
 // The Polygon object contains a array of one or more linear rings
@@ -65,11 +75,16 @@ type Polygon struct {
 	// Bbox     Bbox     `json:"bbox, omitempty"`
 }
 
-// NewPolygon constructs a Polygon from a GeoJSON byte array
-func NewPolygon(bytes []byte) (Polygon, error) {
+// PolygonFromBytes constructs a Polygon from a GeoJSON byte array
+func PolygonFromBytes(bytes []byte) (Polygon, error) {
 	var result Polygon
 	err := json.Unmarshal(bytes, &result)
 	return result, err
+}
+
+// NewPolygon is the normal factory method for a Polygon
+func NewPolygon(coordinates [][][]float64) *Polygon {
+	return &Polygon{Type: POLYGON, Coordinates: coordinates}
 }
 
 // The MultiPoint object contains a array of one or more points
@@ -79,11 +94,16 @@ type MultiPoint struct {
 	// Bbox     Bbox     `json:"bbox, omitempty"`
 }
 
-// NewMultiPoint constructs a MultiPoint from a GeoJSON byte array
-func NewMultiPoint(bytes []byte) (MultiPoint, error) {
+// MultiPointFromBytes constructs a MultiPoint from a GeoJSON byte array
+func MultiPointFromBytes(bytes []byte) (MultiPoint, error) {
 	var result MultiPoint
 	err := json.Unmarshal(bytes, &result)
 	return result, err
+}
+
+// NewMultiPoint is the normal factory method for a MultiPoint
+func NewMultiPoint(coordinates [][]float64) *MultiPoint {
+	return &MultiPoint{Type: MULTIPOINT, Coordinates: coordinates}
 }
 
 // The MultiLineString object contains a array of one or more line strings
@@ -93,11 +113,16 @@ type MultiLineString struct {
 	// Bbox     Bbox     `json:"bbox, omitempty"`
 }
 
-// NewMultiLineString constructs a MultiLineString from a GeoJSON byte array
-func NewMultiLineString(bytes []byte) (MultiLineString, error) {
+// MultiLineStringFromBytes constructs a MultiLineString from a GeoJSON byte array
+func MultiLineStringFromBytes(bytes []byte) (MultiLineString, error) {
 	var result MultiLineString
 	err := json.Unmarshal(bytes, &result)
 	return result, err
+}
+
+// NewMultiLineString is the normal factory method for a LineString
+func NewMultiLineString(coordinates [][][]float64) *MultiLineString {
+	return &MultiLineString{Type: MULTILINESTRING, Coordinates: coordinates}
 }
 
 // The MultiPolygon object contains a array of one or more polygons
@@ -107,11 +132,16 @@ type MultiPolygon struct {
 	// Bbox     Bbox     `json:"bbox, omitempty"`
 }
 
-// NewMultiPolygon constructs a MultiPolygon from a GeoJSON byte array
-func NewMultiPolygon(bytes []byte) (MultiPolygon, error) {
+// MultiPolygonFromBytes constructs a MultiPolygon from a GeoJSON byte array
+func MultiPolygonFromBytes(bytes []byte) (MultiPolygon, error) {
 	var result MultiPolygon
 	err := json.Unmarshal(bytes, &result)
 	return result, err
+}
+
+// NewMultiPolygon is the normal factory method for a MultiPolygon
+func NewMultiPolygon(coordinates [][][][]float64) *MultiPolygon {
+	return &MultiPolygon{Type: MULTIPOLYGON, Coordinates: coordinates}
 }
 
 // The GeometryCollection object contains a array of one or more polygons
@@ -121,8 +151,8 @@ type GeometryCollection struct {
 	// Bbox     Bbox     `json:"bbox, omitempty"`
 }
 
-// NewGeometryCollection constructs a GeometryCollection from a GeoJSON byte array
-func NewGeometryCollection(bytes []byte) (GeometryCollection, error) {
+// GeometryCollectionFromBytes constructs a GeometryCollection from a GeoJSON byte array
+func GeometryCollectionFromBytes(bytes []byte) (GeometryCollection, error) {
 	var result GeometryCollection
 	err := json.Unmarshal(bytes, &result)
 	var geometries []interface{}
@@ -138,6 +168,11 @@ func NewGeometryCollection(bytes []byte) (GeometryCollection, error) {
 		result.Geometries = geometries
 	}
 	return result, err
+}
+
+// NewGeometryCollection is the normal factory method for a GeometryCollection
+func NewGeometryCollection(geometries []interface{}) *GeometryCollection {
+	return &GeometryCollection{Type: LINESTRING, Geometries: geometries}
 }
 
 // This quasi-recursive function determines drills into the

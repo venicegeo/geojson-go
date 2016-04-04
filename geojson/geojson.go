@@ -30,23 +30,23 @@ func Parse(bytes []byte) (interface{}, error) {
 	err := json.Unmarshal(bytes, &geojson)
 	switch geojson.Type {
 	case "Point":
-		result, err = NewPoint(bytes)
+		result, err = PointFromBytes(bytes)
 	case "LineString":
-		result, err = NewLineString(bytes)
+		result, err = LineStringFromBytes(bytes)
 	case "Polygon":
-		result, err = NewPolygon(bytes)
+		result, err = PolygonFromBytes(bytes)
 	case "MultiPoint":
-		result, err = NewMultiPoint(bytes)
+		result, err = MultiPointFromBytes(bytes)
 	case "MultiLineString":
-		result, err = NewMultiLineString(bytes)
+		result, err = MultiLineStringFromBytes(bytes)
 	case "MultiPolygon":
-		result, err = NewMultiPolygon(bytes)
+		result, err = MultiPolygonFromBytes(bytes)
 	case "GeometryCollection":
-		result, err = NewGeometryCollection(bytes)
+		result, err = GeometryCollectionFromBytes(bytes)
 	case "Feature":
-		result, err = NewFeature(bytes)
+		result, err = FeatureFromBytes(bytes)
 	case "FeatureCollection":
-		result, err = NewFeatureCollection(bytes)
+		result, err = FeatureCollectionFromBytes(bytes)
 	}
 	return result, err
 }
