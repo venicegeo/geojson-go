@@ -50,3 +50,20 @@ func Parse(bytes []byte) (interface{}, error) {
 	}
 	return result, err
 }
+
+// ToGeometryArray takes a GeoJSON object and returns an array of
+// its constituent geometry objects
+func ToGeometryArray(gjObject interface{}) []interface{} {
+	var result []interface{}
+	switch typedGJ := gjObject.(type) {
+	case FeatureCollection:
+		for inx := 0; inx < len(typedGJ.Features); inx++ {
+			result = append(result, typedGJ.Features[inx].Geometry)
+		}
+	case Feature:
+		result = append(result, typedGJ.Geometry)
+	default:
+		result = append(result, typedGJ)
+	}
+	return result
+}
