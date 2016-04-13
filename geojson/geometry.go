@@ -30,11 +30,14 @@ const (
 	GEOMETRYCOLLECTION = "GeometryCollection"
 )
 
+// The BoundingBox type supports bbox elements in GeoJSON
+type BoundingBox []float64
+
 // The Point object contains a single position
 type Point struct {
-	Type        string    `json:"type"`
-	Coordinates []float64 `json:"coordinates"`
-	// Bbox     Bbox     `json:"bbox, omitempty"`
+	Type        string      `json:"type"`
+	Coordinates []float64   `json:"coordinates"`
+	Bbox        BoundingBox `json:"bbox,omitempty"`
 }
 
 // PointFromBytes constructs a point from a GeoJSON byte array

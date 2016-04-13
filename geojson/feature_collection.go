@@ -23,9 +23,9 @@ const FEATURECOLLECTION = "FeatureCollection"
 
 // The FeatureCollection object represents an array of features
 type FeatureCollection struct {
-	Type     string    `json:"type"`
-	Features []Feature `json:"features"`
-	//	Bbox     Bbox      `json:"bbox, omitempty"`
+	Type     string      `json:"type"`
+	Features []Feature   `json:"features"`
+	Bbox     BoundingBox `json:"bbox,omitempty"`
 }
 
 // FeatureCollectionFromBytes constructs a FeatureCollection from a GeoJSON byte array

@@ -26,8 +26,8 @@ type Feature struct {
 	Type       string                 `json:"type"`
 	Geometry   interface{}            `json:"geometry"`
 	Properties map[string]interface{} `json:"properties"`
-	ID         string                 `json:"id, omitempty"`
-	// Bbox     Bbox     `json:"bbox, omitempty"`
+	ID         string                 `json:"id,omitempty"`
+	Bbox       BoundingBox            `json:"bbox,omitempty"`
 }
 
 // FeatureFromBytes constructs a Feature from a GeoJSON byte array

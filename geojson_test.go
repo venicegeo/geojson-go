@@ -30,4 +30,5 @@ func TestGeoJSON(t *testing.T) {
 	process("test/multipolygon.geojson")
 	process("test/geometrycollection.geojson")
 	process("test/sample.geojson")
+	process("test/boundingbox.geojson")
 }
