@@ -56,7 +56,7 @@ func NewPoint(coordinates []float64) *Point {
 type LineString struct {
 	Type        string      `json:"type"`
 	Coordinates [][]float64 `json:"coordinates"`
-	// Bbox     Bbox     `json:"bbox, omitempty"`
+	Bbox        BoundingBox `json:"bbox,omitempty"`
 }
 
 // LineStringFromBytes constructs a LineString from a GeoJSON byte array
@@ -75,7 +75,7 @@ func NewLineString(coordinates [][]float64) *LineString {
 type Polygon struct {
 	Type        string        `json:"type"`
 	Coordinates [][][]float64 `json:"coordinates"`
-	// Bbox     Bbox     `json:"bbox, omitempty"`
+	Bbox        BoundingBox   `json:"bbox,omitempty"`
 }
 
 // PolygonFromBytes constructs a Polygon from a GeoJSON byte array
@@ -94,7 +94,7 @@ func NewPolygon(coordinates [][][]float64) *Polygon {
 type MultiPoint struct {
 	Type        string      `json:"type"`
 	Coordinates [][]float64 `json:"coordinates"`
-	// Bbox     Bbox     `json:"bbox, omitempty"`
+	Bbox        BoundingBox `json:"bbox,omitempty"`
 }
 
 // MultiPointFromBytes constructs a MultiPoint from a GeoJSON byte array
@@ -113,7 +113,7 @@ func NewMultiPoint(coordinates [][]float64) *MultiPoint {
 type MultiLineString struct {
 	Type        string        `json:"type"`
 	Coordinates [][][]float64 `json:"coordinates"`
-	// Bbox     Bbox     `json:"bbox, omitempty"`
+	Bbox        BoundingBox   `json:"bbox,omitempty"`
 }
 
 // MultiLineStringFromBytes constructs a MultiLineString from a GeoJSON byte array
@@ -132,7 +132,7 @@ func NewMultiLineString(coordinates [][][]float64) *MultiLineString {
 type MultiPolygon struct {
 	Type        string          `json:"type"`
 	Coordinates [][][][]float64 `json:"coordinates"`
-	// Bbox     Bbox     `json:"bbox, omitempty"`
+	Bbox        BoundingBox     `json:"bbox,omitempty"`
 }
 
 // MultiPolygonFromBytes constructs a MultiPolygon from a GeoJSON byte array
@@ -151,7 +151,7 @@ func NewMultiPolygon(coordinates [][][][]float64) *MultiPolygon {
 type GeometryCollection struct {
 	Type       string        `json:"type"`
 	Geometries []interface{} `json:"geometries"`
-	// Bbox     Bbox     `json:"bbox, omitempty"`
+	Bbox       BoundingBox   `json:"bbox,omitempty"`
 }
 
 // GeometryCollectionFromBytes constructs a GeometryCollection from a GeoJSON byte array
