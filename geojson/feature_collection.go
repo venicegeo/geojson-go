@@ -32,7 +32,7 @@ type FeatureCollection struct {
 func FeatureCollectionFromBytes(bytes []byte) (FeatureCollection, error) {
 	var result FeatureCollection
 	err := json.Unmarshal(bytes, &result)
-	for inx := 0; inx < len(result.Features); inx++ {
+	for inx := range result.Features {
 		result.Features[inx].resolveGeometry()
 	}
 	return result, err

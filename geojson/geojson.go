@@ -57,7 +57,7 @@ func ToGeometryArray(gjObject interface{}) []interface{} {
 	var result []interface{}
 	switch typedGJ := gjObject.(type) {
 	case FeatureCollection:
-		for inx := 0; inx < len(typedGJ.Features); inx++ {
+		for inx := range typedGJ.Features {
 			result = append(result, typedGJ.Features[inx].Geometry)
 		}
 	case Feature:
