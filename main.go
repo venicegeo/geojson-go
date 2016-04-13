@@ -26,19 +26,6 @@ import (
 	"github.com/venicegeo/geojson-go/geojson"
 )
 
-func test() {
-	process("test/point.geojson")
-	process("test/linestring.geojson")
-	process("test/polygon.geojson")
-	process("test/polygon-dateline.geojson")
-	process("test/polygon-hole.geojson")
-	process("test/multipoint.geojson")
-	process("test/multilinestring.geojson")
-	process("test/multipolygon.geojson")
-	process("test/geometrycollection.geojson")
-	process("test/sample.geojson")
-}
-
 func process(filename string) {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -61,12 +48,8 @@ func main() {
 
 	var args = os.Args[1:]
 	if len(args) > 0 {
-		if args[0] == "-t" {
-			test()
-		} else {
-			for inx := 0; inx < len(args); inx++ {
-				process(args[inx])
-			}
+		for inx := range args {
+			process(args[inx])
 		}
 	}
 }
