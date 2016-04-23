@@ -31,11 +31,14 @@ type Feature struct {
 }
 
 // FeatureFromBytes constructs a Feature from a GeoJSON byte array
-func FeatureFromBytes(bytes []byte) (Feature, error) {
+// and returns its pointer
+func FeatureFromBytes(bytes []byte) (*Feature, error) {
 	var result Feature
-	err := json.Unmarshal(bytes, &result)
+	if err := json.Unmarshal(bytes, &result); err != nil {
+		return nil, err
+	}
 	result.resolveGeometry()
-	return result, err
+	return &result, nil
 }
 
 // NewFeature is the normal factory method for a feature

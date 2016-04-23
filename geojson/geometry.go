@@ -41,10 +41,11 @@ type Point struct {
 }
 
 // PointFromBytes constructs a point from a GeoJSON byte array
-func PointFromBytes(bytes []byte) (Point, error) {
+// and returns its pointer
+func PointFromBytes(bytes []byte) (*Point, error) {
 	var result Point
 	err := json.Unmarshal(bytes, &result)
-	return result, err
+	return &result, err
 }
 
 // NewPoint is the normal factory method for a Point
@@ -60,10 +61,11 @@ type LineString struct {
 }
 
 // LineStringFromBytes constructs a LineString from a GeoJSON byte array
-func LineStringFromBytes(bytes []byte) (LineString, error) {
+// and returns its pointer
+func LineStringFromBytes(bytes []byte) (*LineString, error) {
 	var result LineString
 	err := json.Unmarshal(bytes, &result)
-	return result, err
+	return &result, err
 }
 
 // NewLineString is the normal factory method for a LineString
@@ -79,10 +81,11 @@ type Polygon struct {
 }
 
 // PolygonFromBytes constructs a Polygon from a GeoJSON byte array
-func PolygonFromBytes(bytes []byte) (Polygon, error) {
+// and returns its pointer
+func PolygonFromBytes(bytes []byte) (*Polygon, error) {
 	var result Polygon
 	err := json.Unmarshal(bytes, &result)
-	return result, err
+	return &result, err
 }
 
 // NewPolygon is the normal factory method for a Polygon
@@ -98,10 +101,11 @@ type MultiPoint struct {
 }
 
 // MultiPointFromBytes constructs a MultiPoint from a GeoJSON byte array
-func MultiPointFromBytes(bytes []byte) (MultiPoint, error) {
+// and returns its pointer
+func MultiPointFromBytes(bytes []byte) (*MultiPoint, error) {
 	var result MultiPoint
 	err := json.Unmarshal(bytes, &result)
-	return result, err
+	return &result, err
 }
 
 // NewMultiPoint is the normal factory method for a MultiPoint
@@ -117,10 +121,11 @@ type MultiLineString struct {
 }
 
 // MultiLineStringFromBytes constructs a MultiLineString from a GeoJSON byte array
-func MultiLineStringFromBytes(bytes []byte) (MultiLineString, error) {
+// and returns its pointer
+func MultiLineStringFromBytes(bytes []byte) (*MultiLineString, error) {
 	var result MultiLineString
 	err := json.Unmarshal(bytes, &result)
-	return result, err
+	return &result, err
 }
 
 // NewMultiLineString is the normal factory method for a LineString
@@ -136,10 +141,11 @@ type MultiPolygon struct {
 }
 
 // MultiPolygonFromBytes constructs a MultiPolygon from a GeoJSON byte array
-func MultiPolygonFromBytes(bytes []byte) (MultiPolygon, error) {
+// and returns its pointer
+func MultiPolygonFromBytes(bytes []byte) (*MultiPolygon, error) {
 	var result MultiPolygon
 	err := json.Unmarshal(bytes, &result)
-	return result, err
+	return &result, err
 }
 
 // NewMultiPolygon is the normal factory method for a MultiPolygon
@@ -155,7 +161,7 @@ type GeometryCollection struct {
 }
 
 // GeometryCollectionFromBytes constructs a GeometryCollection from a GeoJSON byte array
-func GeometryCollectionFromBytes(bytes []byte) (GeometryCollection, error) {
+func GeometryCollectionFromBytes(bytes []byte) (*GeometryCollection, error) {
 	var result GeometryCollection
 	err := json.Unmarshal(bytes, &result)
 	var geometries []interface{}
@@ -170,7 +176,7 @@ func GeometryCollectionFromBytes(bytes []byte) (GeometryCollection, error) {
 	if err != nil {
 		result.Geometries = geometries
 	}
-	return result, err
+	return &result, err
 }
 
 // NewGeometryCollection is the normal factory method for a GeometryCollection
@@ -212,49 +218,60 @@ func interfaceArrayToArray(input []interface{}) interface{} {
 // NewGeometry constructs a Geometry from a map that represents a
 // GeoJSON Geometry Object
 func NewGeometry(input map[string]interface{}) interface{} {
-	var result interface{}
+	var (
+		result      interface{}
+		coordinates []interface{}
+	)
+	if _, ok := input[COORDINATES]; ok {
+		coordinates = input[COORDINATES].([]interface{})
+	}
 	iType := input["type"].(string)
-	coordinates := input[COORDINATES].([]interface{})
 	switch iType {
 	case POINT:
-		var point Point
-		point.Type = iType
-		point.Coordinates = interfaceArrayToArray(coordinates).([]float64)
-		result = point
+		result = NewPoint(interfaceArrayToArray(coordinates).([]float64))
 	case LINESTRING:
-		var lineString LineString
-		lineString.Type = iType
-		lineString.Coordinates = interfaceArrayToArray(coordinates).([][]float64)
-		result = lineString
+		result = NewLineString(interfaceArrayToArray(coordinates).([][]float64))
 	case POLYGON:
-		var polygon Polygon
-		polygon.Type = iType
-		polygon.Coordinates = interfaceArrayToArray(coordinates).([][][]float64)
-		result = polygon
+		result = NewPolygon(interfaceArrayToArray(coordinates).([][][]float64))
 	case MULTIPOINT:
-		var multiPoint MultiPoint
-		multiPoint.Type = iType
-		multiPoint.Coordinates = interfaceArrayToArray(coordinates).([][]float64)
-		result = multiPoint
+		result = NewMultiPoint(interfaceArrayToArray(coordinates).([][]float64))
 	case MULTILINESTRING:
-		var multiLineString MultiLineString
-		multiLineString.Type = iType
-		multiLineString.Coordinates = interfaceArrayToArray(coordinates).([][][]float64)
-		result = multiLineString
+		result = NewMultiLineString(interfaceArrayToArray(coordinates).([][][]float64))
 	case MULTIPOLYGON:
-		var multiPolygon MultiPolygon
-		multiPolygon.Type = iType
-		multiPolygon.Coordinates = interfaceArrayToArray(coordinates).([][][][]float64)
-		result = multiPolygon
+		result = NewMultiPolygon(interfaceArrayToArray(coordinates).([][][][]float64))
 	case GEOMETRYCOLLECTION:
-		var geometryCollection GeometryCollection
-		geometryCollection.Type = iType
 		geometries := input["geometries"].([]interface{})
-		for inx := 0; inx < len(geometries); inx++ {
-			geometryCollection.Geometries = append(geometryCollection.Geometries,
-				NewGeometry(geometries[inx].(map[string]interface{})))
+		for inx := range geometries {
+			geometries[inx] = NewGeometry(geometries[inx].(map[string]interface{}))
 		}
-		result = geometryCollection
+		result = NewGeometryCollection(geometries)
+	}
+	return result
+}
+
+// ToGeometryArray takes a GeoJSON object and returns an array of
+// its constituent geometry objects
+func ToGeometryArray(gjObject interface{}) []interface{} {
+	var result []interface{}
+	switch typedGJ := gjObject.(type) {
+	case *FeatureCollection:
+		// re-enter with dereferenced pointer
+		result = ToGeometryArray(*typedGJ)
+	case FeatureCollection:
+		for _, current := range typedGJ.Features {
+			result = append(result, current.Geometry)
+		}
+	case *Feature:
+		// re-enter with dereferenced pointer
+		result = ToGeometryArray(*typedGJ)
+	case Feature:
+		result = append(result, typedGJ.Geometry)
+	case *interface{}:
+		// re-enter with dereferenced pointer
+		result = ToGeometryArray(*typedGJ)
+	default:
+		// Hopefully this is a Geometry object
+		result = append(result, typedGJ)
 	}
 	return result
 }

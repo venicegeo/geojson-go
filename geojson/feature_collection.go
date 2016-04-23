@@ -24,21 +24,24 @@ const FEATURECOLLECTION = "FeatureCollection"
 // The FeatureCollection object represents an array of features
 type FeatureCollection struct {
 	Type     string      `json:"type"`
-	Features []Feature   `json:"features"`
+	Features []*Feature  `json:"features"`
 	Bbox     BoundingBox `json:"bbox,omitempty"`
 }
 
 // FeatureCollectionFromBytes constructs a FeatureCollection from a GeoJSON byte array
-func FeatureCollectionFromBytes(bytes []byte) (FeatureCollection, error) {
+// and returns its pointer
+func FeatureCollectionFromBytes(bytes []byte) (*FeatureCollection, error) {
 	var result FeatureCollection
-	err := json.Unmarshal(bytes, &result)
-	for inx := range result.Features {
-		result.Features[inx].resolveGeometry()
+	if err := json.Unmarshal(bytes, &result); err != nil {
+		return nil, err
 	}
-	return result, err
+	for _, feature := range result.Features {
+		feature.resolveGeometry()
+	}
+	return &result, nil
 }
 
 // NewFeatureCollection is the normal factory method for a FeatureCollection
-func NewFeatureCollection(features []Feature) *FeatureCollection {
+func NewFeatureCollection(features []*Feature) *FeatureCollection {
 	return &FeatureCollection{Type: FEATURECOLLECTION, Features: features}
 }

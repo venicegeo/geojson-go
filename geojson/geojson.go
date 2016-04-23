@@ -16,19 +16,27 @@ limitations under the License.
 
 package geojson
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"io/ioutil"
+)
 
 // The GeoJSON object represents a geometry, feature, or collection of features.
 type GeoJSON struct {
 	Type string `json:"type"`
 }
 
-// Parse parses a GeoJSON string into a GeoJSON object
+// Parse parses a GeoJSON string into a GeoJSON object pointer
 func Parse(bytes []byte) (interface{}, error) {
-	var result interface{}
-	var geojson GeoJSON
-	err := json.Unmarshal(bytes, &geojson)
-	switch geojson.Type {
+	var (
+		result interface{}
+		gj     GeoJSON
+		err    error
+	)
+	if err = json.Unmarshal(bytes, &gj); err != nil {
+		return nil, err
+	}
+	switch gj.Type {
 	case "Point":
 		result, err = PointFromBytes(bytes)
 	case "LineString":
@@ -51,19 +59,31 @@ func Parse(bytes []byte) (interface{}, error) {
 	return result, err
 }
 
-// ToGeometryArray takes a GeoJSON object and returns an array of
-// its constituent geometry objects
-func ToGeometryArray(gjObject interface{}) []interface{} {
-	var result []interface{}
-	switch typedGJ := gjObject.(type) {
-	case FeatureCollection:
-		for inx := range typedGJ.Features {
-			result = append(result, typedGJ.Features[inx].Geometry)
-		}
-	case Feature:
-		result = append(result, typedGJ.Geometry)
-	default:
-		result = append(result, typedGJ)
+// ParseFile parses a file containing a GeoJSON string into a GeoJSON object pointer
+func ParseFile(filename string) (interface{}, error) {
+	var (
+		bytes []byte
+		err   error
+	)
+	if bytes, err = ioutil.ReadFile(filename); err != nil {
+		return nil, err
 	}
-	return result
+	return Parse(bytes)
+}
+
+// Write writes a GeoJSON object into a byte array
+func Write(input interface{}) ([]byte, error) {
+	return json.Marshal(input)
+}
+
+// WriteFile writes a GeoJSON object to the file specified
+func WriteFile(input interface{}, filename string) error {
+	var (
+		bytes []byte
+		err   error
+	)
+	if bytes, err = Write(input); err != nil {
+		return err
+	}
+	return ioutil.WriteFile(filename, bytes, 0666)
 }

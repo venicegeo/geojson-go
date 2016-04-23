@@ -17,9 +17,7 @@ limitations under the License.
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -27,19 +25,18 @@ import (
 )
 
 func process(filename string) {
-	file, err := ioutil.ReadFile(filename)
-	if err != nil {
-		log.Panicf("File error: %v\n", err)
-	}
-	geojson, err := geojson.Parse([]byte(file))
-	if err != nil {
+	var (
+		gj    interface{}
+		err   error
+		bytes []byte
+	)
+	if gj, err = geojson.ParseFile(filename); err != nil {
 		log.Panicf("Parse error: %v\n", err)
 	}
-	fmt.Printf("%#v\n", geojson)
-	var bytes []byte
-	bytes, err = json.Marshal(geojson)
-	if err != nil {
-		log.Panicf("Marshal error: %v\n", err)
+	fmt.Printf("%T: %#v\n", gj, gj)
+
+	if bytes, err = geojson.Write(gj); err != nil {
+		log.Panicf("Write error: %v\n", err)
 	}
 	fmt.Printf("%v\n", string(bytes))
 }

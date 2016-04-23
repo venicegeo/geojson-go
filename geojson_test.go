@@ -16,7 +16,12 @@ limitations under the License.
 
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/venicegeo/geojson-go/geojson"
+)
 
 // TestGeoJSON tests GeoJSON readers
 func TestGeoJSON(t *testing.T) {
@@ -31,4 +36,17 @@ func TestGeoJSON(t *testing.T) {
 	process("test/geometrycollection.geojson")
 	process("test/sample.geojson")
 	process("test/boundingbox.geojson")
+}
+
+func TestToGeometryArray(t *testing.T) {
+	var (
+		gj     interface{}
+		err    error
+		result []interface{}
+	)
+	if gj, err = geojson.ParseFile("test/sample.geojson"); err != nil {
+		t.Errorf("Failed to parse file: %v", err)
+	}
+	result = geojson.ToGeometryArray(gj)
+	fmt.Printf("Geometries: %#v\n", result)
 }
