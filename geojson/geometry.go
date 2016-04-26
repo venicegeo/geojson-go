@@ -181,7 +181,7 @@ func GeometryCollectionFromBytes(bytes []byte) (*GeometryCollection, error) {
 
 // NewGeometryCollection is the normal factory method for a GeometryCollection
 func NewGeometryCollection(geometries []interface{}) *GeometryCollection {
-	return &GeometryCollection{Type: LINESTRING, Geometries: geometries}
+	return &GeometryCollection{Type: GEOMETRYCOLLECTION, Geometries: geometries}
 }
 
 // This quasi-recursive function determines drills into the
