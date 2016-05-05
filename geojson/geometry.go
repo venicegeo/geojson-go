@@ -30,9 +30,6 @@ const (
 	GEOMETRYCOLLECTION = "GeometryCollection"
 )
 
-// The BoundingBox type supports bbox elements in GeoJSON
-type BoundingBox []float64
-
 // The Point object contains a single position
 type Point struct {
 	Type        string      `json:"type"`
@@ -46,6 +43,14 @@ func PointFromBytes(bytes []byte) (*Point, error) {
 	var result Point
 	err := json.Unmarshal(bytes, &result)
 	return &result, err
+}
+
+// ForceBbox returns a bounding box, creating one by brute force if needed
+func (point Point) ForceBbox() BoundingBox {
+	if len(point.Bbox) > 0 {
+		return point.Bbox
+	}
+	return bboxFromCoords(point.Coordinates)
 }
 
 // NewPoint is the normal factory method for a Point
@@ -68,6 +73,14 @@ func LineStringFromBytes(bytes []byte) (*LineString, error) {
 	return &result, err
 }
 
+// ForceBbox returns a bounding box, creating one by brute force if needed
+func (ls LineString) ForceBbox() BoundingBox {
+	if len(ls.Bbox) > 0 {
+		return ls.Bbox
+	}
+	return bboxFromCoords(ls.Coordinates)
+}
+
 // NewLineString is the normal factory method for a LineString
 func NewLineString(coordinates [][]float64) *LineString {
 	return &LineString{Type: LINESTRING, Coordinates: coordinates}
@@ -86,6 +99,14 @@ func PolygonFromBytes(bytes []byte) (*Polygon, error) {
 	var result Polygon
 	err := json.Unmarshal(bytes, &result)
 	return &result, err
+}
+
+// ForceBbox returns a bounding box, creating one by brute force if needed
+func (polygon Polygon) ForceBbox() BoundingBox {
+	if len(polygon.Bbox) > 0 {
+		return polygon.Bbox
+	}
+	return bboxFromCoords(polygon.Coordinates)
 }
 
 // NewPolygon is the normal factory method for a Polygon
@@ -108,6 +129,14 @@ func MultiPointFromBytes(bytes []byte) (*MultiPoint, error) {
 	return &result, err
 }
 
+// ForceBbox returns a bounding box, creating one by brute force if needed
+func (mp MultiPoint) ForceBbox() BoundingBox {
+	if len(mp.Bbox) > 0 {
+		return mp.Bbox
+	}
+	return bboxFromCoords(mp.Coordinates)
+}
+
 // NewMultiPoint is the normal factory method for a MultiPoint
 func NewMultiPoint(coordinates [][]float64) *MultiPoint {
 	return &MultiPoint{Type: MULTIPOINT, Coordinates: coordinates}
@@ -126,6 +155,14 @@ func MultiLineStringFromBytes(bytes []byte) (*MultiLineString, error) {
 	var result MultiLineString
 	err := json.Unmarshal(bytes, &result)
 	return &result, err
+}
+
+// ForceBbox returns a bounding box, creating one by brute force if needed
+func (mls MultiLineString) ForceBbox() BoundingBox {
+	if len(mls.Bbox) > 0 {
+		return mls.Bbox
+	}
+	return bboxFromCoords(mls.Coordinates)
 }
 
 // NewMultiLineString is the normal factory method for a LineString
@@ -148,6 +185,14 @@ func MultiPolygonFromBytes(bytes []byte) (*MultiPolygon, error) {
 	return &result, err
 }
 
+// ForceBbox returns a bounding box, creating one by brute force if needed
+func (mp MultiPolygon) ForceBbox() BoundingBox {
+	if len(mp.Bbox) > 0 {
+		return mp.Bbox
+	}
+	return bboxFromCoords(mp.Coordinates)
+}
+
 // NewMultiPolygon is the normal factory method for a MultiPolygon
 func NewMultiPolygon(coordinates [][][][]float64) *MultiPolygon {
 	return &MultiPolygon{Type: MULTIPOLYGON, Coordinates: coordinates}
@@ -165,18 +210,27 @@ func GeometryCollectionFromBytes(bytes []byte) (*GeometryCollection, error) {
 	var result GeometryCollection
 	err := json.Unmarshal(bytes, &result)
 	var geometries []interface{}
-	for inx := 0; inx < len(result.Geometries); inx++ {
-		gmap := result.Geometries[inx].(map[string]interface{})
+	for _, curr := range result.Geometries {
+		gmap := curr.(map[string]interface{})
 		geometry := NewGeometry(gmap)
 		geometries = append(geometries, geometry)
-		if err != nil {
-			break
+	}
+	result.Geometries = geometries
+	return &result, err
+}
+
+// ForceBbox returns a bounding box, creating one by brute force if needed
+func (gc GeometryCollection) ForceBbox() BoundingBox {
+	if len(gc.Bbox) > 0 {
+		return gc.Bbox
+	}
+	var result BoundingBox
+	for _, geometry := range gc.Geometries {
+		if bboxIfc, ok := geometry.(BoundingBoxIfc); ok {
+			result = mergeBboxes(result, bboxIfc.ForceBbox())
 		}
 	}
-	if err != nil {
-		result.Geometries = geometries
-	}
-	return &result, err
+	return result
 }
 
 // NewGeometryCollection is the normal factory method for a GeometryCollection

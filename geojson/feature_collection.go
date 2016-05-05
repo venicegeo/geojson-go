@@ -41,6 +41,18 @@ func FeatureCollectionFromBytes(bytes []byte) (*FeatureCollection, error) {
 	return &result, nil
 }
 
+// ForceBbox returns a bounding box, creating one by brute force if needed
+func (fc FeatureCollection) ForceBbox() BoundingBox {
+	if len(fc.Bbox) > 0 {
+		return fc.Bbox
+	}
+	var result BoundingBox
+	for _, feature := range fc.Features {
+		result = mergeBboxes(result, feature.ForceBbox())
+	}
+	return result
+}
+
 // NewFeatureCollection is the normal factory method for a FeatureCollection
 func NewFeatureCollection(features []*Feature) *FeatureCollection {
 	return &FeatureCollection{Type: FEATURECOLLECTION, Features: features}

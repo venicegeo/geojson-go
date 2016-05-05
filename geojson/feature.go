@@ -41,6 +41,18 @@ func FeatureFromBytes(bytes []byte) (*Feature, error) {
 	return &result, nil
 }
 
+// ForceBbox returns a bounding box, creating one by brute force if needed
+func (feature Feature) ForceBbox() BoundingBox {
+	if len(feature.Bbox) > 0 {
+		return feature.Bbox
+	}
+	if bboxIfc, ok := feature.Geometry.(BoundingBoxIfc); ok {
+		return bboxIfc.ForceBbox()
+	}
+
+	return BoundingBox{}
+}
+
 // NewFeature is the normal factory method for a feature
 func NewFeature(geometry interface{}, id string, properties map[string]interface{}) *Feature {
 	return &Feature{Type: FEATURE, Geometry: geometry, Properties: properties, ID: id}

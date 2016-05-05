@@ -23,19 +23,24 @@ import (
 	"github.com/venicegeo/geojson-go/geojson"
 )
 
+var inputFiles = [...]string{
+	"test/point.geojson",
+	"test/linestring.geojson",
+	"test/polygon.geojson",
+	"test/polygon-dateline.geojson",
+	"test/polygon-hole.geojson",
+	"test/multipoint.geojson",
+	"test/multilinestring.geojson",
+	"test/multipolygon.geojson",
+	"test/geometrycollection.geojson",
+	"test/sample.geojson",
+	"test/boundingbox.geojson"}
+
 // TestGeoJSON tests GeoJSON readers
 func TestGeoJSON(t *testing.T) {
-	process("test/point.geojson")
-	process("test/linestring.geojson")
-	process("test/polygon.geojson")
-	process("test/polygon-dateline.geojson")
-	process("test/polygon-hole.geojson")
-	process("test/multipoint.geojson")
-	process("test/multilinestring.geojson")
-	process("test/multipolygon.geojson")
-	process("test/geometrycollection.geojson")
-	process("test/sample.geojson")
-	process("test/boundingbox.geojson")
+	for _, fileName := range inputFiles {
+		process(fileName)
+	}
 }
 
 func TestToGeometryArray(t *testing.T) {
@@ -49,4 +54,13 @@ func TestToGeometryArray(t *testing.T) {
 	}
 	result = geojson.ToGeometryArray(gj)
 	fmt.Printf("Geometries: %#v\n", result)
+}
+
+func TestBbox(t *testing.T) {
+	for inx, fileName := range inputFiles {
+		gj, _ := geojson.ParseFile(fileName)
+		bboxIfc := gj.(geojson.BoundingBoxIfc)
+		bbox := bboxIfc.ForceBbox()
+		fmt.Printf("%v BBox: %v\n", inx+1, bbox)
+	}
 }
