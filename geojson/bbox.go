@@ -64,3 +64,36 @@ func mergeBboxes(first, second BoundingBox) BoundingBox {
 	}
 	return first
 }
+
+// Equals returns true if all points in the bounding boxes are equal
+func (bb BoundingBox) Equals(test BoundingBox) bool {
+	bblen := len(bb)
+	testlen := len(test)
+	if (bblen == 0) && (testlen == 0) {
+		return true
+	}
+	if (bblen == 0) || (testlen == 0) || (bblen != testlen) {
+		return false
+	}
+	for inx := 0; inx < bblen; inx++ {
+		if bb[inx] != test[inx] {
+			return false
+		}
+	}
+	return true
+}
+
+// Overlaps returns true if the interiors of the two bounding boxes
+func (bb BoundingBox) Overlaps(test BoundingBox) bool {
+	bblen := len(bb)
+	testlen := len(test)
+	if (bblen == 0) || (testlen == 0) || (bblen != testlen) {
+		return false
+	}
+	result := true
+	bbDimensions := bblen / 2
+	for inx := 0; inx < bbDimensions; inx++ {
+		result = result && (bb[inx] < test[inx+bbDimensions]) && (bb[inx+bbDimensions] > test[inx])
+	}
+	return result
+}
