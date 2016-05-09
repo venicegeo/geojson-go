@@ -42,7 +42,7 @@ func FeatureCollectionFromBytes(bytes []byte) (*FeatureCollection, error) {
 }
 
 // ForceBbox returns a bounding box, creating one by brute force if needed
-func (fc FeatureCollection) ForceBbox() BoundingBox {
+func (fc *FeatureCollection) ForceBbox() BoundingBox {
 	if len(fc.Bbox) > 0 {
 		return fc.Bbox
 	}
@@ -56,4 +56,34 @@ func (fc FeatureCollection) ForceBbox() BoundingBox {
 // NewFeatureCollection is the normal factory method for a FeatureCollection
 func NewFeatureCollection(features []*Feature) *FeatureCollection {
 	return &FeatureCollection{Type: FEATURECOLLECTION, Features: features}
+}
+
+// Map returns a map of the FeatureCollection's members
+// This may be useful in wrapping a Feature Collection with foreign members
+func (fc *FeatureCollection) Map() map[string]interface{} {
+	result := make(map[string]interface{})
+	result["type"] = fc.Type
+	result["features"] = fc.Features
+	result["bbox"] = fc.Bbox
+	return result
+}
+
+// FeatureCollectionFromMap constructs a FeatureCollection from a map
+// and returns its pointer
+func FeatureCollectionFromMap(input map[string]interface{}) *FeatureCollection {
+	var result FeatureCollection
+	result.Type = input["type"].(string)
+	featuresIfc := input["features"]
+	if featuresArray, ok := featuresIfc.([]interface{}); ok {
+		for _, featureIfc := range featuresArray {
+			if featureMap, ok := featureIfc.(map[string]interface{}); ok {
+				feature := FeatureFromMap(featureMap)
+				result.Features = append(result.Features, feature)
+			}
+		}
+	}
+	if bboxIfc, ok := input["bbox"]; ok {
+		result.Bbox = NewBoundingBox(bboxIfc)
+	}
+	return &result
 }

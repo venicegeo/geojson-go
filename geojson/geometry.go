@@ -50,7 +50,7 @@ func (point Point) ForceBbox() BoundingBox {
 	if len(point.Bbox) > 0 {
 		return point.Bbox
 	}
-	return bboxFromCoords(point.Coordinates)
+	return NewBoundingBox(point.Coordinates)
 }
 
 // NewPoint is the normal factory method for a Point
@@ -78,7 +78,7 @@ func (ls LineString) ForceBbox() BoundingBox {
 	if len(ls.Bbox) > 0 {
 		return ls.Bbox
 	}
-	return bboxFromCoords(ls.Coordinates)
+	return NewBoundingBox(ls.Coordinates)
 }
 
 // NewLineString is the normal factory method for a LineString
@@ -106,7 +106,7 @@ func (polygon Polygon) ForceBbox() BoundingBox {
 	if len(polygon.Bbox) > 0 {
 		return polygon.Bbox
 	}
-	return bboxFromCoords(polygon.Coordinates)
+	return NewBoundingBox(polygon.Coordinates)
 }
 
 // NewPolygon is the normal factory method for a Polygon
@@ -134,7 +134,7 @@ func (mp MultiPoint) ForceBbox() BoundingBox {
 	if len(mp.Bbox) > 0 {
 		return mp.Bbox
 	}
-	return bboxFromCoords(mp.Coordinates)
+	return NewBoundingBox(mp.Coordinates)
 }
 
 // NewMultiPoint is the normal factory method for a MultiPoint
@@ -162,7 +162,7 @@ func (mls MultiLineString) ForceBbox() BoundingBox {
 	if len(mls.Bbox) > 0 {
 		return mls.Bbox
 	}
-	return bboxFromCoords(mls.Coordinates)
+	return NewBoundingBox(mls.Coordinates)
 }
 
 // NewMultiLineString is the normal factory method for a LineString
@@ -190,7 +190,7 @@ func (mp MultiPolygon) ForceBbox() BoundingBox {
 	if len(mp.Bbox) > 0 {
 		return mp.Bbox
 	}
-	return bboxFromCoords(mp.Coordinates)
+	return NewBoundingBox(mp.Coordinates)
 }
 
 // NewMultiPolygon is the normal factory method for a MultiPolygon

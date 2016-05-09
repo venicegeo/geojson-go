@@ -16,7 +16,11 @@ limitations under the License.
 
 package geojson
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"math"
+	"strconv"
+)
 
 // FEATURE is a GeoJSON Feature
 const FEATURE = "Feature"
@@ -62,4 +66,58 @@ func NewFeature(geometry interface{}, id string, properties map[string]interface
 // This method reconstructs them
 func (feature *Feature) resolveGeometry() {
 	feature.Geometry = NewGeometry(feature.Geometry.(map[string]interface{}))
+}
+
+// PropertyString returns the string value of the property if it exists
+// and is a string, or the empty string otherwise
+func (feature *Feature) PropertyString(propertyName string) string {
+	var result string
+	if property, ok := feature.Properties[propertyName]; ok {
+		switch ptype := property.(type) {
+		case string:
+			result = ptype
+		case float64:
+			result = strconv.FormatFloat(ptype, 'f', -1, 64)
+		}
+	}
+	return result
+}
+
+// PropertyFloat returns the floating point value of the property if it exists
+// and is a float or is a parseable string, or math.NaN() otherwise
+func (feature *Feature) PropertyFloat(propertyName string) float64 {
+	var result = math.NaN()
+	if property, ok := feature.Properties[propertyName]; ok {
+		switch ptype := property.(type) {
+		case string:
+			if parsedFloat, err := strconv.ParseFloat(ptype, 64); err != nil {
+				result = parsedFloat
+			}
+		case float64:
+			result = ptype
+		}
+	}
+	return result
+}
+
+// FeatureFromMap constructs a Feature from a map
+// and returns its pointer
+func FeatureFromMap(input map[string]interface{}) *Feature {
+	var result Feature
+	result.Type = input["type"].(string)
+	result.Properties = input["properties"].(map[string]interface{})
+	result.Geometry = input["geometry"]
+	result.resolveGeometry()
+	if bboxIfc, ok := input["bbox"]; ok {
+		result.Bbox = NewBoundingBox(bboxIfc)
+	}
+	if id, ok := input["id"]; ok {
+		switch idtype := id.(type) {
+		case string:
+			result.ID = idtype
+		case int:
+			result.ID = strconv.FormatInt(int64(idtype), 10)
+		}
+	}
+	return &result
 }

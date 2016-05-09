@@ -16,6 +16,11 @@ limitations under the License.
 
 package geojson
 
+import (
+	"strconv"
+	"strings"
+)
+
 // BoundingBoxIfc is for objects that have a bounding box property
 type BoundingBoxIfc interface {
 	ForceBbox() BoundingBox
@@ -24,24 +29,33 @@ type BoundingBoxIfc interface {
 // The BoundingBox type supports bbox elements in GeoJSON
 type BoundingBox []float64
 
-func bboxFromCoords(input interface{}) BoundingBox {
+// NewBoundingBox creates a BoundingBox from a large number of inputs
+// including a string and an n-dimensional coordinate array
+func NewBoundingBox(input interface{}) BoundingBox {
 	var (
 		result BoundingBox
 	)
 	switch inputType := input.(type) {
+	case string:
+		coords := strings.Split(inputType, ",")
+		for _, coord := range coords {
+			if coordValue, err := strconv.ParseFloat(coord, 64); err == nil {
+				result = append(result, coordValue)
+			}
+		}
 	case []float64:
 		result = append(inputType, inputType[:]...)
 	case [][]float64:
 		for _, curr := range inputType {
-			result = mergeBboxes(result, bboxFromCoords(curr))
+			result = mergeBboxes(result, NewBoundingBox(curr))
 		}
 	case [][][]float64:
 		for _, curr := range inputType {
-			result = mergeBboxes(result, bboxFromCoords(curr))
+			result = mergeBboxes(result, NewBoundingBox(curr))
 		}
 	case [][][][]float64:
 		for _, curr := range inputType {
-			result = mergeBboxes(result, bboxFromCoords(curr))
+			result = mergeBboxes(result, NewBoundingBox(curr))
 		}
 	}
 	return result
