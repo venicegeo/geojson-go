@@ -32,9 +32,8 @@ type BoundingBox []float64
 // NewBoundingBox creates a BoundingBox from a large number of inputs
 // including a string and an n-dimensional coordinate array
 func NewBoundingBox(input interface{}) BoundingBox {
-	var (
-		result BoundingBox
-	)
+	var result BoundingBox
+
 	switch inputType := input.(type) {
 	case string:
 		coords := strings.Split(inputType, ",")
@@ -58,6 +57,7 @@ func NewBoundingBox(input interface{}) BoundingBox {
 			result = mergeBboxes(result, NewBoundingBox(curr))
 		}
 	}
+
 	return result
 }
 
@@ -98,6 +98,7 @@ func (bb BoundingBox) Equals(test BoundingBox) bool {
 }
 
 // Overlaps returns true if the interiors of the two bounding boxes
+// have any area in common
 func (bb BoundingBox) Overlaps(test BoundingBox) bool {
 	bblen := len(bb)
 	testlen := len(test)
