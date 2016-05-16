@@ -65,7 +65,11 @@ func NewFeature(geometry interface{}, id string, properties map[string]interface
 // Since unmarshaled objects don't come back as real geometries,
 // This method reconstructs them
 func (feature *Feature) resolveGeometry() {
-	feature.Geometry = NewGeometry(feature.Geometry.(map[string]interface{}))
+	if feature.Geometry != nil {
+		if geometry, ok := feature.Geometry.(map[string]interface{}); ok {
+			feature.Geometry = NewGeometry(geometry)
+		}
+	}
 }
 
 // PropertyString returns the string value of the property if it exists
@@ -78,6 +82,43 @@ func (feature *Feature) PropertyString(propertyName string) string {
 			result = ptype
 		case float64:
 			result = strconv.FormatFloat(ptype, 'f', -1, 64)
+		}
+	}
+	return result
+}
+
+// PropertyInt returns the integer value of the property if it exists
+// or 0 otherwise
+func (feature *Feature) PropertyInt(propertyName string) int {
+	var result int
+	if property, ok := feature.Properties[propertyName]; ok {
+		switch ptype := property.(type) {
+		case string:
+			tempInt64, _ := strconv.ParseInt(ptype, 10, 64)
+			result = int(tempInt64)
+		case int:
+			result = ptype
+		case int64:
+			result = int(ptype)
+		}
+	}
+	return result
+}
+
+// PropertyStringSlice returns the string slice value of the property if it exists
+// or an empty slice otherwise
+func (feature *Feature) PropertyStringSlice(propertyName string) []string {
+	var result []string
+	if property, ok := feature.Properties[propertyName]; ok {
+		switch ptype := property.(type) {
+		case []string:
+			result = ptype
+		case []interface{}:
+			for _, curr := range ptype {
+				if currString, ok := curr.(string); ok {
+					result = append(result, currString)
+				}
+			}
 		}
 	}
 	return result
