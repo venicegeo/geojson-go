@@ -112,3 +112,11 @@ func (bb BoundingBox) Overlaps(test BoundingBox) bool {
 	}
 	return result
 }
+
+// String returns a string representation as minx,miny,maxx,maxy
+func (bb BoundingBox) String() string {
+	return strconv.FormatFloat(bb[0], 'f', 3, 32) + "," +
+		strconv.FormatFloat(bb[1], 'f', 3, 32) + "," +
+		strconv.FormatFloat(bb[2], 'f', 3, 32) + "," +
+		strconv.FormatFloat(bb[3], 'f', 3, 32)
+}

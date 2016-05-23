@@ -61,6 +61,6 @@ func TestBbox(t *testing.T) {
 		gj, _ := geojson.ParseFile(fileName)
 		bboxIfc := gj.(geojson.BoundingBoxIfc)
 		bbox := bboxIfc.ForceBbox()
-		fmt.Printf("%v BBox: %v\n", inx+1, bbox)
+		fmt.Printf("%v BBox: %v\n", inx+1, bbox.String())
 	}
 }
