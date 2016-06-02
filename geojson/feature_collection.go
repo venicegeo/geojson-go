@@ -36,7 +36,7 @@ func FeatureCollectionFromBytes(bytes []byte) (*FeatureCollection, error) {
 		return nil, err
 	}
 	for _, feature := range result.Features {
-		feature.resolveGeometry()
+		feature.ResolveGeometry()
 	}
 	return &result, nil
 }

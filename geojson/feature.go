@@ -41,7 +41,7 @@ func FeatureFromBytes(bytes []byte) (*Feature, error) {
 	if err := json.Unmarshal(bytes, &result); err != nil {
 		return nil, err
 	}
-	result.resolveGeometry()
+	result.ResolveGeometry()
 	return &result, nil
 }
 
@@ -62,9 +62,9 @@ func NewFeature(geometry interface{}, id string, properties map[string]interface
 	return &Feature{Type: FEATURE, Geometry: geometry, Properties: properties, ID: id}
 }
 
-// Since unmarshaled objects don't come back as real geometries,
-// This method reconstructs them
-func (feature *Feature) resolveGeometry() {
+// ResolveGeometry reconstructs a Feature's geometries
+// since unmarshaled objects come back as interfaces, not real geometries,
+func (feature *Feature) ResolveGeometry() {
 	if feature.Geometry != nil {
 		if geometry, ok := feature.Geometry.(map[string]interface{}); ok {
 			feature.Geometry = NewGeometry(geometry)
@@ -148,7 +148,7 @@ func FeatureFromMap(input map[string]interface{}) *Feature {
 	result.Type = input["type"].(string)
 	result.Properties = input["properties"].(map[string]interface{})
 	result.Geometry = input["geometry"]
-	result.resolveGeometry()
+	result.ResolveGeometry()
 	if bboxIfc, ok := input["bbox"]; ok {
 		result.Bbox = NewBoundingBox(bboxIfc)
 	}
