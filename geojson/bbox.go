@@ -27,6 +27,9 @@ type BoundingBoxIfc interface {
 }
 
 // The BoundingBox type supports bbox elements in GeoJSON
+// Note that since this is an array,
+// it is passed by value instead of pointer
+// (unlike other GeoJSON objects)
 type BoundingBox []float64
 
 // NewBoundingBox creates a BoundingBox from a large number of inputs
