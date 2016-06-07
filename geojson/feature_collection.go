@@ -55,6 +55,9 @@ func (fc *FeatureCollection) ForceBbox() BoundingBox {
 
 // NewFeatureCollection is the normal factory method for a FeatureCollection
 func NewFeatureCollection(features []*Feature) *FeatureCollection {
+	if features == nil {
+		features = make([]*Feature, 0)
+	}
 	return &FeatureCollection{Type: FEATURECOLLECTION, Features: features}
 }
 
