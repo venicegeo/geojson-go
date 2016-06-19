@@ -16,7 +16,12 @@ limitations under the License.
 
 package geojson
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+	"strconv"
+	"strings"
+)
 
 // GeoJSON Constants
 const (
@@ -56,6 +61,35 @@ func (point Point) ForceBbox() BoundingBox {
 // NewPoint is the normal factory method for a Point
 func NewPoint(coordinates []float64) *Point {
 	return &Point{Type: POINT, Coordinates: coordinates}
+}
+
+// WKT returns the Well Known Text representation of the point
+func (point Point) WKT() string {
+	var result string
+	switch len(point.Coordinates) {
+	case 2:
+		result = fmt.Sprintf("POINT (%v)", array1ToWKTCoordinates(point.Coordinates))
+	case 3:
+		result = fmt.Sprintf("POINT Z (%v)", array1ToWKTCoordinates(point.Coordinates))
+	case 4:
+		result = fmt.Sprintf("POINT ZM (%v)", array1ToWKTCoordinates(point.Coordinates))
+	default:
+		result = "POINT EMPTY"
+	}
+	return result
+}
+
+func array1ToWKTCoordinates(input []float64) string {
+	var result string
+	switch len(input) {
+	case 2:
+		result = fmt.Sprintf("%f %f", input[0], input[1])
+	case 3:
+		result = fmt.Sprintf("%f %f %f", input[0], input[1], input[2])
+	case 4:
+		result = fmt.Sprintf("%f %f %f %f", input[0], input[1], input[2], input[3])
+	}
+	return result
 }
 
 // The LineString object contains a array of two or more positions
@@ -328,4 +362,89 @@ func ToGeometryArray(gjObject interface{}) []interface{} {
 		result = append(result, typedGJ)
 	}
 	return result
+}
+
+// WKT returns a GeoJSON object based on the Well-Known Text input
+func WKT(input string) interface{} {
+	parts := strings.SplitN(input, " ", 2)
+	name := parts[0]
+	predicate := parseWKTPredicate(parts[1])
+
+	switch name {
+	case "POINT":
+		if coords, ok := predicate.([]float64); ok {
+			return NewPoint(coords)
+		}
+		return NewPoint(nil)
+	case "POLYGON":
+		if coords, ok := predicate.([][][]float64); ok {
+			return NewPolygon(coords)
+		}
+		return NewPolygon(nil)
+	case "LINESTRING":
+		if coords, ok := predicate.([][]float64); ok {
+			return NewLineString(coords)
+		}
+		return NewLineString(nil)
+	case "MULTIPOINT":
+		switch mpp := predicate.(type) {
+		case [][]float64:
+			return NewMultiPoint(mpp)
+		default:
+			fmt.Printf("%T\n", mpp)
+			return NewMultiPoint(nil)
+		}
+	}
+	return nil
+}
+
+func parseWKTPredicate(input string) interface{} {
+
+	parts := strings.SplitN(input, "(", 2)
+	switch string(parts[1][0]) {
+	case "(":
+		var result2 [][]float64
+		var result3 [][][]float64
+		for _, part := range strings.Split(parts[1], ")") {
+			// fmt.Printf("Part: %s\n", part)
+			if strings.Index(part, "(") >= 0 {
+				currIfc := parseWKTPredicate(part)
+				switch curr := currIfc.(type) {
+				case []float64:
+					result2 = append(result2, curr)
+				case [][]float64:
+					result3 = append(result3, curr)
+				}
+				// part = strings.Split(part, "(")[1]
+				// result = append(result, parseWKTCoordinates(strings.Trim(part, " )")))
+			}
+		}
+		if result2 != nil {
+			return result2
+		} else if result3 != nil {
+			return result3
+		}
+	default:
+		switch strings.Index(parts[1], ",") {
+		case -1:
+			parts = strings.SplitN(parts[1], ")", 2)
+			return parseWKTCoordinates(parts[0])
+		default:
+			var result [][]float64
+			for _, part := range strings.Split(parts[1], ",") {
+				result = append(result, parseWKTCoordinates(strings.Trim(part, " )")))
+			}
+			return result
+		}
+	}
+	return nil
+}
+
+func parseWKTCoordinates(input string) []float64 {
+	var coords []float64
+	for _, part := range strings.Split(input, " ") {
+		coord, _ := strconv.ParseFloat(part, 10)
+		coords = append(coords, coord)
+	}
+	return coords
 }
