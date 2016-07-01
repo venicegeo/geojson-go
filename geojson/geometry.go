@@ -55,7 +55,10 @@ func (point Point) ForceBbox() BoundingBox {
 	if len(point.Bbox) > 0 {
 		return point.Bbox
 	}
-	return NewBoundingBox(point.Coordinates)
+	if bbox, err := NewBoundingBox(point.Coordinates); err == nil {
+		return bbox
+	}
+	return []float64{}
 }
 
 // NewPoint is the normal factory method for a Point
@@ -112,7 +115,10 @@ func (ls LineString) ForceBbox() BoundingBox {
 	if len(ls.Bbox) > 0 {
 		return ls.Bbox
 	}
-	return NewBoundingBox(ls.Coordinates)
+	if bbox, err := NewBoundingBox(ls.Coordinates); err == nil {
+		return bbox
+	}
+	return []float64{}
 }
 
 // NewLineString is the normal factory method for a LineString
@@ -140,7 +146,10 @@ func (polygon Polygon) ForceBbox() BoundingBox {
 	if len(polygon.Bbox) > 0 {
 		return polygon.Bbox
 	}
-	return NewBoundingBox(polygon.Coordinates)
+	if bbox, err := NewBoundingBox(polygon.Coordinates); err == nil {
+		return bbox
+	}
+	return []float64{}
 }
 
 // NewPolygon is the normal factory method for a Polygon
@@ -168,7 +177,10 @@ func (mp MultiPoint) ForceBbox() BoundingBox {
 	if len(mp.Bbox) > 0 {
 		return mp.Bbox
 	}
-	return NewBoundingBox(mp.Coordinates)
+	if bbox, err := NewBoundingBox(mp.Coordinates); err == nil {
+		return bbox
+	}
+	return []float64{}
 }
 
 // NewMultiPoint is the normal factory method for a MultiPoint
@@ -196,7 +208,10 @@ func (mls MultiLineString) ForceBbox() BoundingBox {
 	if len(mls.Bbox) > 0 {
 		return mls.Bbox
 	}
-	return NewBoundingBox(mls.Coordinates)
+	if bbox, err := NewBoundingBox(mls.Coordinates); err == nil {
+		return bbox
+	}
+	return []float64{}
 }
 
 // NewMultiLineString is the normal factory method for a LineString
@@ -224,7 +239,10 @@ func (mp MultiPolygon) ForceBbox() BoundingBox {
 	if len(mp.Bbox) > 0 {
 		return mp.Bbox
 	}
-	return NewBoundingBox(mp.Coordinates)
+	if bbox, err := NewBoundingBox(mp.Coordinates); err == nil {
+		return bbox
+	}
+	return []float64{}
 }
 
 // NewMultiPolygon is the normal factory method for a MultiPolygon

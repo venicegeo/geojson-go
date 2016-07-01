@@ -86,7 +86,7 @@ func FeatureCollectionFromMap(input map[string]interface{}) *FeatureCollection {
 		}
 	}
 	if bboxIfc, ok := input["bbox"]; ok {
-		result.Bbox = NewBoundingBox(bboxIfc)
+		result.Bbox, _ = NewBoundingBox(bboxIfc)
 	}
 	return &result
 }

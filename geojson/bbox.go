@@ -17,6 +17,7 @@ limitations under the License.
 package geojson
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 )
@@ -34,34 +35,57 @@ type BoundingBox []float64
 
 // NewBoundingBox creates a BoundingBox from a large number of inputs
 // including a string and an n-dimensional coordinate array
-func NewBoundingBox(input interface{}) BoundingBox {
-	var result BoundingBox
+func NewBoundingBox(input interface{}) (BoundingBox, error) {
+	var (
+		result, bbox2 BoundingBox
+		err           error
+		coordValue    float64
+	)
 
 	switch inputType := input.(type) {
 	case string:
-		coords := strings.Split(inputType, ",")
-		for _, coord := range coords {
-			if coordValue, err := strconv.ParseFloat(coord, 64); err == nil {
-				result = append(result, coordValue)
+		if inputType != "" {
+			coords := strings.Split(inputType, ",")
+			for _, coord := range coords {
+				if coordValue, err = strconv.ParseFloat(coord, 64); err == nil {
+					result = append(result, coordValue)
+				} else {
+					return result, errors.New("Failed to parse bounding box: " + err.Error())
+				}
 			}
 		}
 	case []float64:
 		result = append(inputType, inputType[:]...)
 	case [][]float64:
 		for _, curr := range inputType {
-			result = mergeBboxes(result, NewBoundingBox(curr))
+			if bbox2, err = NewBoundingBox(curr); err == nil {
+				result = mergeBboxes(result, bbox2)
+			} else {
+				return result, err
+			}
 		}
 	case [][][]float64:
 		for _, curr := range inputType {
-			result = mergeBboxes(result, NewBoundingBox(curr))
+			if bbox2, err = NewBoundingBox(curr); err == nil {
+				result = mergeBboxes(result, bbox2)
+			} else {
+				return result, err
+			}
 		}
 	case [][][][]float64:
 		for _, curr := range inputType {
-			result = mergeBboxes(result, NewBoundingBox(curr))
+			if bbox2, err = NewBoundingBox(curr); err == nil {
+				result = mergeBboxes(result, bbox2)
+			} else {
+				return result, err
+			}
 		}
 	}
 
-	return result
+	if result.Valid() {
+		return result, nil
+	}
+	return []float64{}, errors.New("Bounding box has invalid number of coordinates")
 }
 
 func mergeBboxes(first, second BoundingBox) BoundingBox {
@@ -118,8 +142,33 @@ func (bb BoundingBox) Overlaps(test BoundingBox) bool {
 
 // String returns a string representation as minx,miny,maxx,maxy
 func (bb BoundingBox) String() string {
-	return strconv.FormatFloat(bb[0], 'f', 3, 32) + "," +
-		strconv.FormatFloat(bb[1], 'f', 3, 32) + "," +
-		strconv.FormatFloat(bb[2], 'f', 3, 32) + "," +
-		strconv.FormatFloat(bb[3], 'f', 3, 32)
+	var result string
+	switch len(bb) {
+	case 4:
+		result = strconv.FormatFloat(bb[0], 'f', 3, 32) + "," +
+			strconv.FormatFloat(bb[1], 'f', 3, 32) + "," +
+			strconv.FormatFloat(bb[2], 'f', 3, 32) + "," +
+			strconv.FormatFloat(bb[3], 'f', 3, 32)
+	case 6:
+		result = strconv.FormatFloat(bb[0], 'f', 3, 32) + "," +
+			strconv.FormatFloat(bb[1], 'f', 3, 32) + "," +
+			strconv.FormatFloat(bb[2], 'f', 3, 32) + "," +
+			strconv.FormatFloat(bb[3], 'f', 3, 32) + "," +
+			strconv.FormatFloat(bb[4], 'f', 3, 32) + "," +
+			strconv.FormatFloat(bb[5], 'f', 3, 32)
+	}
+	return result
+}
+
+// Valid returns true if the bounding box is valid
+func (bb BoundingBox) Valid() bool {
+	switch len(bb) {
+	case 0:
+		return true
+	case 4:
+		return true
+	case 6:
+		return true
+	}
+	return false
 }

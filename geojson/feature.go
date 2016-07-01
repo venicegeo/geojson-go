@@ -150,7 +150,7 @@ func FeatureFromMap(input map[string]interface{}) *Feature {
 	result.Geometry = input["geometry"]
 	result.ResolveGeometry()
 	if bboxIfc, ok := input["bbox"]; ok {
-		result.Bbox = NewBoundingBox(bboxIfc)
+		result.Bbox, _ = NewBoundingBox(bboxIfc)
 	}
 	if id, ok := input["id"]; ok {
 		switch idtype := id.(type) {
