@@ -83,10 +83,7 @@ func NewBoundingBox(input interface{}) (BoundingBox, error) {
 		}
 	}
 
-	if result.Valid() {
-		return result, nil
-	}
-	return []float64{}, errors.New("Bounding box has invalid number of coordinates")
+	return result, result.Valid()
 }
 
 func mergeBboxes(first, second BoundingBox) BoundingBox {
@@ -161,15 +158,22 @@ func (bb BoundingBox) String() string {
 	return result
 }
 
-// Valid returns true if the bounding box is valid
-func (bb BoundingBox) Valid() bool {
+// Valid returns nil if the bounding box is valid
+// or an error object if it is invalid
+func (bb BoundingBox) Valid() error {
 	switch len(bb) {
 	case 0:
-		return true
+		return nil
 	case 4:
-		return true
+		if bb[0] > bb[2] || bb[1] > bb[3] {
+			return errors.New("Bounding Box values must be in south-westerly to north-easterly order.")
+		}
+		return nil
 	case 6:
-		return true
+		if bb[0] > bb[3] || bb[1] > bb[4] || bb[2] > bb[5] {
+			return errors.New("Bounding Box values must be in south-westerly to north-easterly order.")
+		}
+		return nil
 	}
-	return false
+	return errors.New("Bounding Box must have 0, 4, or 6 values.")
 }

@@ -27,6 +27,7 @@ const bbox1 = "10,10,20,20"
 const bbox2 = "10,10,20,20,30"
 const bbox3 = "10,10,20,foo"
 const bbox4 = "10,10,20,20,30,30"
+const bbox5 = "40,10,20,20,30,30"
 
 // TestGeoJSON tests GeoJSON readers
 func TestBBox(t *testing.T) {
@@ -37,25 +38,28 @@ func TestBBox(t *testing.T) {
 	if bbox, err = geojson.NewBoundingBox(bbox0); err != nil {
 		t.Error(err)
 	}
-	if !bbox.Valid() {
-		t.Errorf("\"%v\" is supposed to be a valid bounding box.", bbox0)
+	if bbox.Valid() != nil {
+		t.Errorf("\"%v\" is supposed to be a valid bounding box but it returned %v.", bbox0, bbox.Valid().Error())
 	}
 	if bbox, err = geojson.NewBoundingBox(bbox1); err != nil {
 		t.Error(err)
 	}
-	if !bbox.Valid() {
+	if bbox.Valid() != nil {
 		t.Errorf("\"%v\" is supposed to be a valid bounding box.", bbox1)
 	}
 	if _, err = geojson.NewBoundingBox(bbox2); err == nil {
-		t.Errorf("\"%v\" is supposed to be a invalid bounding box.", bbox2)
+		t.Errorf("\"%v\" is supposed to be an invalid bounding box.", bbox2)
 	}
 	if _, err = geojson.NewBoundingBox(bbox3); err == nil {
-		t.Errorf("\"%v\" is supposed to be an valid bounding box.", bbox3)
+		t.Errorf("\"%v\" is supposed to be an invalid bounding box.", bbox3)
 	}
 	if bbox, err = geojson.NewBoundingBox(bbox4); err != nil {
 		t.Error(err)
 	}
-	if !bbox.Valid() {
-		t.Errorf("\"%v\" is supposed to be a valid bounding box.", bbox4)
+	if bbox.Valid() != nil {
+		t.Errorf("\"%v\" is supposed to be a valid bounding box but it returned %v.", bbox4, bbox.Valid().Error())
+	}
+	if _, err = geojson.NewBoundingBox(bbox5); err == nil {
+		t.Errorf("\"%v\" is supposed to be an invalid bounding box.", bbox5)
 	}
 }
