@@ -43,16 +43,17 @@ func NewBoundingBox(input interface{}) (BoundingBox, error) {
 	)
 
 	switch inputType := input.(type) {
+	case []string:
+		for _, coord := range inputType {
+			if coordValue, err = strconv.ParseFloat(coord, 64); err == nil {
+				result = append(result, coordValue)
+			} else {
+				return result, errors.New("Failed to parse bounding box: " + err.Error())
+			}
+		}
 	case string:
 		if inputType != "" {
-			coords := strings.Split(inputType, ",")
-			for _, coord := range coords {
-				if coordValue, err = strconv.ParseFloat(coord, 64); err == nil {
-					result = append(result, coordValue)
-				} else {
-					return result, errors.New("Failed to parse bounding box: " + err.Error())
-				}
-			}
+			return NewBoundingBox(strings.Split(inputType, ","))
 		}
 	case []float64:
 		result = append(inputType, inputType[:]...)
