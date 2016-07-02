@@ -28,6 +28,7 @@ const bbox2 = "10,10,20,20,30"
 const bbox3 = "10,10,20,foo"
 const bbox4 = "10,10,20,20,30,30"
 const bbox5 = "40,10,20,20,30,30"
+const bbox6 = "10,40,20,20,30,30"
 
 // TestGeoJSON tests GeoJSON readers
 func TestBBox(t *testing.T) {
@@ -59,7 +60,16 @@ func TestBBox(t *testing.T) {
 	if bbox.Valid() != nil {
 		t.Errorf("\"%v\" is supposed to be a valid bounding box but it returned %v.", bbox4, bbox.Valid().Error())
 	}
-	if _, err = geojson.NewBoundingBox(bbox5); err == nil {
-		t.Errorf("\"%v\" is supposed to be an invalid bounding box.", bbox5)
+	if bbox, err = geojson.NewBoundingBox(bbox5); err != nil {
+		t.Error(err)
+	}
+	if bbox.Valid() != nil {
+		t.Errorf("\"%v\" is supposed to be a valid bounding box but it returned %v.", bbox5, bbox.Valid().Error())
+	}
+	if !bbox.Antimeridian() {
+		t.Errorf("\"%v\" crosses the antimeridian but the check returned false.", bbox5)
+	}
+	if _, err = geojson.NewBoundingBox(bbox6); err == nil {
+		t.Errorf("\"%v\" is supposed to be an invalid bounding box.", bbox6)
 	}
 }

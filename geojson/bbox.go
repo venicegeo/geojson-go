@@ -165,15 +165,34 @@ func (bb BoundingBox) Valid() error {
 	case 0:
 		return nil
 	case 4:
-		if bb[0] > bb[2] || bb[1] > bb[3] {
+		if bb[1] > bb[3] {
 			return errors.New("Bounding Box values must be in south-westerly to north-easterly order.")
 		}
 		return nil
 	case 6:
-		if bb[0] > bb[3] || bb[1] > bb[4] || bb[2] > bb[5] {
+		if bb[1] > bb[4] || bb[2] > bb[5] {
 			return errors.New("Bounding Box values must be in south-westerly to north-easterly order.")
 		}
 		return nil
 	}
 	return errors.New("Bounding Box must have 0, 4, or 6 values.")
+}
+
+// Antimeridian returns true if the BoundingBox crosses the antimeridian
+func (bb BoundingBox) Antimeridian() bool {
+	if bb.Valid() != nil {
+		return false
+	}
+	switch len(bb) {
+	case 0:
+	case 4:
+		if bb[0] > bb[2] {
+			return true
+		}
+	case 6:
+		if bb[0] > bb[3] {
+			return true
+		}
+	}
+	return false
 }
