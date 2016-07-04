@@ -81,6 +81,10 @@ func NewBoundingBox(input interface{}) (BoundingBox, error) {
 				return result, err
 			}
 		}
+	case []BoundingBox:
+		for _, curr := range inputType {
+			result = mergeBboxes(result, curr)
+		}
 	}
 
 	return result, result.Valid()
@@ -91,12 +95,34 @@ func mergeBboxes(first, second BoundingBox) BoundingBox {
 	if length == 0 {
 		return second
 	}
-	for inx := 0; inx < length/2; inx++ {
+	// Generally this covers the case where second is empty for some reason
+	if length != len(second) {
+		return first
+	}
+
+	// For X, we must consider the antimeridian case
+	if (first[0] == -180) && (second[length/2] == 180) {
+		first[0] = second[length/2]
+		first[length/2] = second[0]
+	} else if (first[length/2] == 180) && (second[0] == -180) {
+		first[length/2] = second[length/2]
+	} else {
+		if second[0] < first[0] {
+			first[0] = second[0]
+		}
+		if second[length/2] > first[length/2] {
+			first[length/2] = second[length/2]
+		}
+	}
+
+	// Consider the minimum values
+	for inx := 1; inx < length/2; inx++ {
 		if second[inx] < first[inx] {
 			first[inx] = second[inx]
 		}
 	}
-	for inx := length / 2; inx < length; inx++ {
+	// Consider the maximum values
+	for inx := 1 + length/2; inx < length; inx++ {
 		if second[inx] > first[inx] {
 			first[inx] = second[inx]
 		}
