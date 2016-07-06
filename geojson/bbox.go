@@ -152,13 +152,26 @@ func (bb BoundingBox) Equals(test BoundingBox) bool {
 func (bb BoundingBox) Overlaps(test BoundingBox) bool {
 	bblen := len(bb)
 	testlen := len(test)
+
 	if (bblen == 0) || (testlen == 0) || (bblen != testlen) {
 		return false
 	}
 	result := true
 	bbDimensions := bblen / 2
-	for inx := 0; inx < bbDimensions; inx++ {
-		result = result && (bb[inx] < test[inx+bbDimensions]) && (bb[inx+bbDimensions] > test[inx])
+	if bb.Antimeridian() && test.Antimeridian() {
+		// no op
+	} else if bb.Antimeridian() {
+		result = result && ((test[bbDimensions] >= bb[0]) && (test[bbDimensions] <= 180) ||
+			(test[0] <= bb[bbDimensions]) && (test[0] >= -180))
+	} else if test.Antimeridian() {
+		result = result && ((bb[bbDimensions] >= test[0]) && (bb[bbDimensions] <= 180) ||
+			(bb[0] <= test[bbDimensions]) && (bb[0] >= -180))
+	} else {
+		result = result && (bb[0] < test[bbDimensions]) && (bb[bbDimensions] > test[0])
+	}
+	result = result && (bb[1] < test[1+bbDimensions]) && (bb[1+bbDimensions] > test[1])
+	if bbDimensions > 2 {
+		result = result && (bb[2] < test[2+bbDimensions]) && (bb[2+bbDimensions] > test[2])
 	}
 	return result
 }
