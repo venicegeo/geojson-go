@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"log"
 	"testing"
 
 	"github.com/venicegeo/geojson-go/geojson"
@@ -31,12 +32,17 @@ const bbox5 = "40,10,20,20,30,30"
 const bbox6 = "10,40,20,20,30,30"
 const bbox7 = "-180,10,-170,20"
 const bbox8 = "170,10,180,20"
+const bbox9 = "-180,10,20,20"
 
 // TestGeoJSON tests GeoJSON readers
 func TestBBox(t *testing.T) {
 	var (
 		err             error
 		bbox, otherBbox geojson.BoundingBox
+		gjIfc           interface{}
+		fc              *geojson.FeatureCollection
+		mpoly           *geojson.MultiPolygon
+		ok              bool
 	)
 	if bbox, err = geojson.NewBoundingBox(bbox0); err != nil {
 		t.Error(err)
@@ -92,5 +98,43 @@ func TestBBox(t *testing.T) {
 		}
 	} else {
 		t.Errorf("Joining \"%v\" and \"%v\" is supposed to be a valid bounding box.", bbox7, bbox8)
+	}
+	if gjIfc, err = geojson.ParseFile("test/featureCollection.geojson"); err != nil {
+		t.Errorf("Failed to parse file: %v", err)
+	}
+	if fc, ok = gjIfc.(*geojson.FeatureCollection); ok {
+		otherBbox = fc.ForceBbox()
+		if bbox.Overlaps(otherBbox) {
+			t.Error("These bounding boxes (7+8, fc) should not overlap.")
+		}
+		if bbox, err = geojson.NewBoundingBox(bbox9); err == nil {
+			if !bbox.Overlaps(otherBbox) {
+				t.Error("These bounding boxes (9, fc) should overlap.")
+				log.Printf("9: %v; fc: %v", bbox.String(), otherBbox.String())
+			}
+		} else {
+			t.Error(err)
+		}
+	} else {
+		t.Errorf("Expected *geojson.FeatureCollection, got %T", gjIfc)
+	}
+	if gjIfc, err = geojson.ParseFile("test/multipolygon2.geojson"); err != nil {
+		t.Errorf("Failed to parse file: %v", err)
+	}
+	if mpoly, ok = gjIfc.(*geojson.MultiPolygon); ok {
+		bbox = mpoly.ForceBbox()
+		if !bbox.Antimeridian() {
+			t.Errorf("The multipolygon should cross the antimeridian. %v", bbox.String())
+		}
+		if bbox, err = geojson.NewBoundingBox(bbox9); err == nil {
+			if !bbox.Overlaps(otherBbox) {
+				t.Error("These bounding boxes (9, fc) should overlap.")
+				log.Printf("9: %v; fc: %v", bbox.String(), otherBbox.String())
+			}
+		} else {
+			t.Error(err)
+		}
+	} else {
+		t.Errorf("Expected *geojson.FeatureCollection, got %T", gjIfc)
 	}
 }
