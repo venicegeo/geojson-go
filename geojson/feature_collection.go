@@ -61,6 +61,17 @@ func NewFeatureCollection(features []*Feature) *FeatureCollection {
 	return &FeatureCollection{Type: FEATURECOLLECTION, Features: features}
 }
 
+// String returns the string representation
+func (fc *FeatureCollection) String() string {
+	var result string
+	if bytes, err := json.Marshal(fc); err == nil {
+		result = string(bytes)
+	} else {
+		result = err.Error()
+	}
+	return result
+}
+
 // Map returns a map of the FeatureCollection's members
 // This may be useful in wrapping a Feature Collection with foreign members
 func (fc *FeatureCollection) Map() map[string]interface{} {

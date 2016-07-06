@@ -102,8 +102,7 @@ func mergeBboxes(first, second BoundingBox) BoundingBox {
 
 	// For X, we must consider the antimeridian case
 	if (first[0] == -180) && (second[length/2] == 180) {
-		first[0] = second[length/2]
-		first[length/2] = second[0]
+		first[0] = second[0]
 	} else if (first[length/2] == 180) && (second[0] == -180) {
 		first[length/2] = second[length/2]
 	} else {

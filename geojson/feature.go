@@ -46,7 +46,7 @@ func FeatureFromBytes(bytes []byte) (*Feature, error) {
 }
 
 // ForceBbox returns a bounding box, creating one by brute force if needed
-func (feature Feature) ForceBbox() BoundingBox {
+func (feature *Feature) ForceBbox() BoundingBox {
 	if len(feature.Bbox) > 0 {
 		return feature.Bbox
 	}
@@ -55,6 +55,17 @@ func (feature Feature) ForceBbox() BoundingBox {
 	}
 
 	return BoundingBox{}
+}
+
+// String returns the string representation
+func (feature *Feature) String() string {
+	var result string
+	if bytes, err := json.Marshal(feature); err == nil {
+		result = string(bytes)
+	} else {
+		result = err.Error()
+	}
+	return result
 }
 
 // NewFeature is the normal factory method for a feature

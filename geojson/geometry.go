@@ -61,6 +61,17 @@ func (point Point) ForceBbox() BoundingBox {
 	return []float64{}
 }
 
+// String returns the string representation
+func (point Point) String() string {
+	var result string
+	if bytes, err := json.Marshal(point); err == nil {
+		result = string(bytes)
+	} else {
+		result = err.Error()
+	}
+	return result
+}
+
 // NewPoint is the normal factory method for a Point
 func NewPoint(coordinates []float64) *Point {
 	return &Point{Type: POINT, Coordinates: coordinates}
@@ -121,6 +132,17 @@ func (ls LineString) ForceBbox() BoundingBox {
 	return []float64{}
 }
 
+// String returns the string representation
+func (ls LineString) String() string {
+	var result string
+	if bytes, err := json.Marshal(ls); err == nil {
+		result = string(bytes)
+	} else {
+		result = err.Error()
+	}
+	return result
+}
+
 // NewLineString is the normal factory method for a LineString
 func NewLineString(coordinates [][]float64) *LineString {
 	return &LineString{Type: LINESTRING, Coordinates: coordinates}
@@ -150,6 +172,17 @@ func (polygon Polygon) ForceBbox() BoundingBox {
 		return bbox
 	}
 	return []float64{}
+}
+
+// String returns the string representation
+func (polygon Polygon) String() string {
+	var result string
+	if bytes, err := json.Marshal(polygon); err == nil {
+		result = string(bytes)
+	} else {
+		result = err.Error()
+	}
+	return result
 }
 
 // NewPolygon is the normal factory method for a Polygon
@@ -183,6 +216,17 @@ func (mp MultiPoint) ForceBbox() BoundingBox {
 	return []float64{}
 }
 
+// String returns the string representation
+func (mp MultiPoint) String() string {
+	var result string
+	if bytes, err := json.Marshal(mp); err == nil {
+		result = string(bytes)
+	} else {
+		result = err.Error()
+	}
+	return result
+}
+
 // NewMultiPoint is the normal factory method for a MultiPoint
 func NewMultiPoint(coordinates [][]float64) *MultiPoint {
 	return &MultiPoint{Type: MULTIPOINT, Coordinates: coordinates}
@@ -214,6 +258,17 @@ func (mls MultiLineString) ForceBbox() BoundingBox {
 	return []float64{}
 }
 
+// String returns the string representation
+func (mls MultiLineString) String() string {
+	var result string
+	if bytes, err := json.Marshal(mls); err == nil {
+		result = string(bytes)
+	} else {
+		result = err.Error()
+	}
+	return result
+}
+
 // NewMultiLineString is the normal factory method for a LineString
 func NewMultiLineString(coordinates [][][]float64) *MultiLineString {
 	return &MultiLineString{Type: MULTILINESTRING, Coordinates: coordinates}
@@ -243,6 +298,17 @@ func (mp MultiPolygon) ForceBbox() BoundingBox {
 		return bbox
 	}
 	return []float64{}
+}
+
+// String returns the string representation
+func (mp MultiPolygon) String() string {
+	var result string
+	if bytes, err := json.Marshal(mp); err == nil {
+		result = string(bytes)
+	} else {
+		result = err.Error()
+	}
+	return result
 }
 
 // NewMultiPolygon is the normal factory method for a MultiPolygon
@@ -281,6 +347,17 @@ func (gc GeometryCollection) ForceBbox() BoundingBox {
 		if bboxIfc, ok := geometry.(BoundingBoxIfc); ok {
 			result = mergeBboxes(result, bboxIfc.ForceBbox())
 		}
+	}
+	return result
+}
+
+// String returns the string representation
+func (gc GeometryCollection) String() string {
+	var result string
+	if bytes, err := json.Marshal(gc); err == nil {
+		result = string(bytes)
+	} else {
+		result = err.Error()
 	}
 	return result
 }
