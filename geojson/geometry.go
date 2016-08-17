@@ -364,6 +364,9 @@ func (gc GeometryCollection) String() string {
 
 // NewGeometryCollection is the normal factory method for a GeometryCollection
 func NewGeometryCollection(geometries []interface{}) *GeometryCollection {
+	if geometries == nil {
+		geometries = make([]interface{}, 0)
+	}
 	return &GeometryCollection{Type: GEOMETRYCOLLECTION, Geometries: geometries}
 }
 
