@@ -70,6 +70,9 @@ func (feature *Feature) String() string {
 
 // NewFeature is the normal factory method for a feature
 func NewFeature(geometry interface{}, id string, properties map[string]interface{}) *Feature {
+	if properties == nil {
+		properties = make(map[string]interface{})
+	}
 	return &Feature{Type: FEATURE, Geometry: geometry, Properties: properties, ID: id}
 }
 
