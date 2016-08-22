@@ -85,8 +85,7 @@ func (fc *FeatureCollection) Map() map[string]interface{} {
 // FeatureCollectionFromMap constructs a FeatureCollection from a map
 // and returns its pointer
 func FeatureCollectionFromMap(input map[string]interface{}) *FeatureCollection {
-	var result FeatureCollection
-	result.Type = input["type"].(string)
+	result := NewFeatureCollection(nil)
 	featuresIfc := input["features"]
 	if featuresArray, ok := featuresIfc.([]interface{}); ok {
 		for _, featureIfc := range featuresArray {
@@ -99,5 +98,5 @@ func FeatureCollectionFromMap(input map[string]interface{}) *FeatureCollection {
 	if bboxIfc, ok := input["bbox"]; ok {
 		result.Bbox, _ = NewBoundingBox(bboxIfc)
 	}
-	return &result
+	return result
 }
