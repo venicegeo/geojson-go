@@ -71,6 +71,28 @@ func ParseFile(filename string) (interface{}, error) {
 	return Parse(bytes)
 }
 
+// FromMap parses a map[string]interface{} containing a GeoJSON string
+// into a GeoJSON object pointer
+func FromMap(input map[string]interface{}) interface{} {
+	var (
+		typeIfc interface{}
+		ok      bool
+	)
+
+	if typeIfc, ok = input["type"]; ok {
+		switch typeIfc.(string) {
+		case FEATURE:
+			return FeatureFromMap(input)
+		case FEATURECOLLECTION:
+			return FeatureCollectionFromMap(input)
+		default:
+			return NewGeometry(input)
+		}
+
+	}
+	return nil
+}
+
 // Write writes a GeoJSON object into a byte array
 func Write(input interface{}) ([]byte, error) {
 	return json.Marshal(input)
