@@ -234,3 +234,26 @@ func (bb BoundingBox) Antimeridian() bool {
 	}
 	return false
 }
+
+// Centroid returns the center of the BoundingBox,
+// or nil if it has no coordinates or is otherwise invalid
+func (bb BoundingBox) Centroid() *Point {
+	var result *Point
+	if bb.Valid() == nil {
+		switch len(bb) {
+		case 0:
+		case 4:
+			var coordinates [2]float64
+			coordinates[0] = 0.5 * (bb[0] + bb[2])
+			coordinates[1] = 0.5 * (bb[1] + bb[3])
+			result = NewPoint(coordinates[0:])
+		case 6:
+			var coordinates [3]float64
+			coordinates[0] = 0.5 * (bb[0] + bb[3])
+			coordinates[1] = 0.5 * (bb[1] + bb[4])
+			coordinates[2] = 0.5 * (bb[2] + bb[5])
+			result = NewPoint(coordinates[0:])
+		}
+	}
+	return result
+}
