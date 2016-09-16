@@ -100,3 +100,27 @@ func FeatureCollectionFromMap(input map[string]interface{}) *FeatureCollection {
 	}
 	return result
 }
+
+// FillProperties iterates through all features to ensure that all properties
+// are present on all features to meet the needs of some relational databases
+func (fc *FeatureCollection) FillProperties() {
+	properties := make(map[string]bool)
+
+	// Loop 1: construct a set (actually a map)
+	for _, feature := range fc.Features {
+		for key := range feature.Properties {
+			if _, ok := properties[key]; !ok {
+				properties[key] = true
+			}
+		}
+	}
+
+	// Loop 2: make sure each feature has each property from the set
+	for _, feature := range fc.Features {
+		for key := range properties {
+			if _, ok := feature.Properties[key]; !ok {
+				feature.Properties[key] = nil
+			}
+		}
+	}
+}
