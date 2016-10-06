@@ -93,6 +93,11 @@ func (point Point) WKT() string {
 	return result
 }
 
+// Trim returns a copy of itself with reduced precision
+func (point Point) Trim(precision int) {
+	point.Coordinates = trim1(point.Coordinates, precision)
+}
+
 func array1ToWKTCoordinates(input []float64) string {
 	var result string
 	switch len(input) {
