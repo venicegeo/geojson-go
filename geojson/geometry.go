@@ -74,7 +74,10 @@ func (point Point) String() string {
 
 // NewPoint is the normal factory method for a Point
 func NewPoint(coordinates []float64) *Point {
-	return &Point{Type: POINT, Coordinates: coordinates}
+	if len(coordinates) > 1 {
+		return &Point{Type: POINT, Coordinates: coordinates}
+	}
+	return nil
 }
 
 // WKT returns the Well Known Text representation of the point

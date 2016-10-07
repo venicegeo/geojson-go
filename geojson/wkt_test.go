@@ -14,15 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package geojson
 
 import (
 	"fmt"
 	"io/ioutil"
 	"log"
 	"testing"
-
-	"github.com/venicegeo/geojson-go/geojson"
 )
 
 var inputWKTFiles = [...]string{
@@ -54,9 +52,9 @@ func TestWKT(t *testing.T) {
 			log.Panicf("Parse error: %v\n", err)
 		}
 		input = string(bytes)
-		gj = geojson.WKT(input)
+		gj = WKT(input)
 
-		if bytes, err = geojson.Write(gj); err != nil {
+		if bytes, err = Write(gj); err != nil {
 			log.Panicf("Write error: %v\n", err)
 		}
 		output = string(bytes)
