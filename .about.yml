@@ -43,7 +43,7 @@ testable: true
 licenses:
   pz-gateway:
     name: Apache-2.0
-    url: https://github.com/venicegeo/pzsvc-image-catalog/blob/master/LICENSE.txt
+    url: https://github.com/venicegeo/geojson-go/blob/master/LICENSE
 
 # Who is the partner for your project? (Use the full name of the partner
 # documented here:
