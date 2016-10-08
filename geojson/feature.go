@@ -18,6 +18,7 @@ package geojson
 
 import (
 	"encoding/json"
+	"fmt"
 	"math"
 	"strconv"
 )
@@ -86,17 +87,52 @@ func (feature *Feature) ResolveGeometry() {
 	}
 }
 
+func stringify(input interface{}) string {
+	var result string
+	switch itype := input.(type) {
+	case string:
+		result = itype
+	case fmt.Stringer:
+		result = itype.String()
+	case int:
+		result = stringify(int64(itype))
+	case float32:
+		result = stringify(float64(itype))
+	case int64:
+		result = strconv.FormatInt(itype, 10)
+	case float64:
+		result = strconv.FormatFloat(itype, 'f', -1, 64)
+	}
+	return result
+}
+
 // PropertyString returns the string value of the property if it exists
 // and is a string, or the empty string otherwise
 func (feature *Feature) PropertyString(propertyName string) string {
 	var result string
 	if property, ok := feature.Properties[propertyName]; ok {
-		switch ptype := property.(type) {
-		case string:
-			result = ptype
-		case float64:
-			result = strconv.FormatFloat(ptype, 'f', -1, 64)
-		}
+		return stringify(property)
+	}
+	return result
+}
+
+func intify(input interface{}) int {
+	var result int
+
+	switch itype := input.(type) {
+	case int:
+		result = itype
+	case string:
+		tempInt64, _ := strconv.ParseInt(itype, 10, 64)
+		result = int(tempInt64)
+	case fmt.Stringer:
+		result = intify(itype.String())
+	case int64:
+		result = intify(int(itype))
+	case float32:
+		result = intify(int(itype))
+	case float64:
+		result = intify(int(itype))
 	}
 	return result
 }
@@ -106,15 +142,7 @@ func (feature *Feature) PropertyString(propertyName string) string {
 func (feature *Feature) PropertyInt(propertyName string) int {
 	var result int
 	if property, ok := feature.Properties[propertyName]; ok {
-		switch ptype := property.(type) {
-		case string:
-			tempInt64, _ := strconv.ParseInt(ptype, 10, 64)
-			result = int(tempInt64)
-		case int:
-			result = ptype
-		case int64:
-			result = int(ptype)
-		}
+		result = intify(property)
 	}
 	return result
 }
@@ -138,19 +166,34 @@ func (feature *Feature) PropertyStringSlice(propertyName string) []string {
 	return result
 }
 
+func floatify(input interface{}) float64 {
+	var result = math.NaN()
+
+	switch itype := input.(type) {
+	case float64:
+		result = itype
+	case string:
+		if parsedFloat, err := strconv.ParseFloat(itype, 64); err == nil {
+			result = parsedFloat
+		}
+	case fmt.Stringer:
+		result = floatify(itype.String())
+	case int64:
+		result = floatify(float64(itype))
+	case float32:
+		result = floatify(float64(itype))
+	case int:
+		result = floatify(float64(itype))
+	}
+	return result
+}
+
 // PropertyFloat returns the floating point value of the property if it exists
 // and is a float or is a parseable string, or math.NaN() otherwise
 func (feature *Feature) PropertyFloat(propertyName string) float64 {
 	var result = math.NaN()
 	if property, ok := feature.Properties[propertyName]; ok {
-		switch ptype := property.(type) {
-		case string:
-			if parsedFloat, err := strconv.ParseFloat(ptype, 64); err != nil {
-				result = parsedFloat
-			}
-		case float64:
-			result = ptype
-		}
+		result = floatify(property)
 	}
 	return result
 }
