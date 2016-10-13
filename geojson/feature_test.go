@@ -83,17 +83,8 @@ func TestFeature(t *testing.T) {
 	}
 	featureCollection := gj.(*FeatureCollection)
 	featureCollection.FillProperties()
-	//featureCollectionB4 := featureCollection.String()
 	fcMap := featureCollection.Map()
 	featureCollection = FeatureCollectionFromMap(fcMap)
-	/*Per Jeff_Y he will need to make changes to FeatureCollections
-	if strings.Compare(featureCollectionB4, featureCollection.String()) != 0 {
-		t.Errorf("featureCollection.geojson failed FillProperties Test")
-		t.Log(featureCollectionB4)
-		t.Log(featureCollection.String())
-		t.Log(fcMap)
-	}*/
-
 	/*Test FeatureFromMap*/
 	if gj, err = ParseFile("test/feature.geojson"); err != nil {
 		t.Errorf("Failed to parse file: %v", err)

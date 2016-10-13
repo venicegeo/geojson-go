@@ -1,13 +1,4 @@
 mode: set
-github.com/venicegeo/geojson-go/geojson/wfs.go:31.70,51.66 10 1
-github.com/venicegeo/geojson-go/geojson/wfs.go:54.2,54.64 1 1
-github.com/venicegeo/geojson-go/geojson/wfs.go:58.2,62.60 3 1
-github.com/venicegeo/geojson-go/geojson/wfs.go:67.2,68.49 2 1
-github.com/venicegeo/geojson-go/geojson/wfs.go:71.2,71.101 1 0
-github.com/venicegeo/geojson-go/geojson/wfs.go:51.66,53.3 1 0
-github.com/venicegeo/geojson-go/geojson/wfs.go:54.64,56.3 1 0
-github.com/venicegeo/geojson-go/geojson/wfs.go:62.60,65.3 2 1
-github.com/venicegeo/geojson-go/geojson/wfs.go:68.49,70.3 1 1
 github.com/venicegeo/geojson-go/geojson/bbox.go:38.61,45.35 2 1
 github.com/venicegeo/geojson-go/geojson/bbox.go:90.2,90.31 1 1
 github.com/venicegeo/geojson-go/geojson/bbox.go:46.2,47.35 1 1
@@ -407,3 +398,12 @@ github.com/venicegeo/geojson-go/geojson/geometry.go:608.54,610.5 1 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:617.50,619.49 2 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:623.2,623.15 1 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:619.49,622.3 2 1
+github.com/venicegeo/geojson-go/geojson/wfs.go:31.70,51.66 10 1
+github.com/venicegeo/geojson-go/geojson/wfs.go:54.2,54.64 1 1
+github.com/venicegeo/geojson-go/geojson/wfs.go:58.2,62.60 3 1
+github.com/venicegeo/geojson-go/geojson/wfs.go:67.2,68.49 2 1
+github.com/venicegeo/geojson-go/geojson/wfs.go:71.2,71.101 1 0
+github.com/venicegeo/geojson-go/geojson/wfs.go:51.66,53.3 1 0
+github.com/venicegeo/geojson-go/geojson/wfs.go:54.64,56.3 1 0
+github.com/venicegeo/geojson-go/geojson/wfs.go:62.60,65.3 2 1
+github.com/venicegeo/geojson-go/geojson/wfs.go:68.49,70.3 1 1
