@@ -74,6 +74,14 @@ func (feature *Feature) String() string {
 	return result
 }
 
+// IDStr returns the ID as a string
+func (feature *Feature) IDStr() string {
+	if feature.ID == nil {
+		return ""
+	}
+	return fmt.Sprintf("%v", feature.ID)
+}
+
 // Map returns a map of the Feature's members
 // This may be useful in wrapping a Feature with foreign members
 func (feature *Feature) Map() Map {
