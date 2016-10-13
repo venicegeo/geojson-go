@@ -35,7 +35,9 @@ var inputFiles = [...]string{
 	"test/multipolygon.geojson",
 	"test/geometrycollection.geojson",
 	"test/sample.geojson",
-	"test/boundingbox.geojson"}
+	"test/boundingbox.geojson",
+	"test/featureCollectionWithGeometryCollection.geojson",
+	"test/featureCollection.geojson"}
 
 func testProcess(filename string) {
 	var (

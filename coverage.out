@@ -306,8 +306,8 @@ github.com/venicegeo/geojson-go/geojson/geometry.go:358.46,360.48 2 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:365.2,365.15 1 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:360.48,362.3 1 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:362.3,364.3 1 0
-github.com/venicegeo/geojson-go/geojson/geometry.go:369.74,370.23 1 0
-github.com/venicegeo/geojson-go/geojson/geometry.go:373.2,373.78 1 0
+github.com/venicegeo/geojson-go/geojson/geometry.go:369.74,370.23 1 1
+github.com/venicegeo/geojson-go/geojson/geometry.go:373.2,373.78 1 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:370.23,372.3 1 0
 github.com/venicegeo/geojson-go/geojson/geometry.go:379.61,385.40 6 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:404.2,404.15 1 1
@@ -327,9 +327,9 @@ github.com/venicegeo/geojson-go/geojson/geometry.go:423.2,424.74 1 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:425.2,426.75 1 0
 github.com/venicegeo/geojson-go/geojson/geometry.go:427.2,428.82 1 0
 github.com/venicegeo/geojson-go/geojson/geometry.go:429.2,430.81 1 1
-github.com/venicegeo/geojson-go/geojson/geometry.go:431.2,433.31 2 0
-github.com/venicegeo/geojson-go/geojson/geometry.go:436.3,436.45 1 0
-github.com/venicegeo/geojson-go/geojson/geometry.go:433.31,435.4 1 0
+github.com/venicegeo/geojson-go/geojson/geometry.go:431.2,433.31 2 1
+github.com/venicegeo/geojson-go/geojson/geometry.go:436.3,436.45 1 1
+github.com/venicegeo/geojson-go/geojson/geometry.go:433.31,435.4 1 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:443.58,445.36 2 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:465.2,465.15 1 1
 github.com/venicegeo/geojson-go/geojson/geometry.go:446.2,448.37 1 1
