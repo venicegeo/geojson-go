@@ -32,16 +32,17 @@ const bbox6 = "10,40,20,20,30,30"
 const bbox7 = "-180,10,-170,20"
 const bbox8 = "170,10,180,20"
 const bbox9 = "-180,-70,-179,70"
+const bbox1clone = "10,10,20,20"
 
 // TestGeoJSON tests GeoJSON readers
 func TestBBox(t *testing.T) {
 	var (
-		err             error
-		bbox, otherBbox BoundingBox
-		gjIfc           interface{}
-		fc              *FeatureCollection
-		mpoly           *MultiPolygon
-		ok              bool
+		err                        error
+		bbox, otherBbox, thirdBbox BoundingBox
+		gjIfc                      interface{}
+		fc                         *FeatureCollection
+		mpoly                      *MultiPolygon
+		ok                         bool
 	)
 	if bbox, err = NewBoundingBox(bbox0); err != nil {
 		t.Error(err)
@@ -54,6 +55,15 @@ func TestBBox(t *testing.T) {
 	}
 	if bbox.Valid() != nil {
 		t.Errorf("\"%v\" is supposed to be a valid bounding box.", bbox1)
+	}
+	if otherBbox, err = NewBoundingBox(bbox1clone); err != nil {
+		t.Error(err)
+	}
+	if otherBbox.Valid() != nil {
+		t.Errorf("\"%v\" is supposed to be a valid bounding box.", bbox1clone)
+	}
+	if !bbox.Equals(otherBbox) {
+		t.Errorf("\"%v\" is supposed to be equal to bbox1clone", bbox1)
 	}
 	if _, err = NewBoundingBox(bbox2); err == nil {
 		t.Errorf("\"%v\" is supposed to be an invalid bounding box.", bbox2)
@@ -88,10 +98,24 @@ func TestBBox(t *testing.T) {
 	if otherBbox, err = NewBoundingBox(bbox8); err != nil {
 		t.Error(err)
 	}
+	if thirdBbox, err = NewBoundingBox(bbox9); err != nil {
+		t.Error(err)
+	}
 	if bbox.Valid() != nil {
 		t.Errorf("\"%v\" is supposed to be a valid bounding box but it returned %v.", bbox8, bbox.Valid().Error())
 	}
 	if bbox, err = NewBoundingBox([]BoundingBox{bbox, otherBbox}); err == nil {
+		bbox.Centroid()
+		if !bbox.Antimeridian() {
+			t.Errorf("Joining \"%v\" and \"%v\" created \"%v\" which should cross the antimeridian but the check returned false.", bbox7, bbox8, bbox.String())
+		}
+	} else {
+		t.Errorf("Joining \"%v\" and \"%v\" is supposed to be a valid bounding box.", bbox7, bbox8)
+	}
+	if bbox, err = NewBoundingBox([]BoundingBox{bbox, otherBbox, thirdBbox}); err == nil {
+		if bbox.Centroid() == nil {
+			t.Errorf("The Centroid of \"%v\" and \"%v\" and \"%v\" should have a valid center. Result \"%v\"", bbox7, bbox8, bbox9, bbox.Centroid())
+		}
 		if !bbox.Antimeridian() {
 			t.Errorf("Joining \"%v\" and \"%v\" created \"%v\" which should cross the antimeridian but the check returned false.", bbox7, bbox8, bbox.String())
 		}
@@ -133,6 +157,7 @@ func TestBBox(t *testing.T) {
 	} else {
 		t.Errorf("Expected *FeatureCollection, got %T", gjIfc)
 	}
+
 }
 
 func TestBbox(t *testing.T) {
