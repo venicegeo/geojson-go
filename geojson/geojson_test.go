@@ -102,15 +102,104 @@ func TestMultiAndColection(t *testing.T) {
 func TestFromMap(t *testing.T) {
 	var gj interface{}
 	var err error
-	if gj, err = ParseFile("test/featureCollection.geojson"); err != nil {
-		t.Errorf("Failed to parse file: %v", err)
-	}
-	featureCollection := gj.(*FeatureCollection)
 	map1 := make(map[string]interface{})
-	map1 = featureCollection.Map()
-	if FromMap(map1) == nil {
-		t.Errorf("Failed to parse file: %v", err)
-		t.Log(FromMap(map1))
+
+	for _, fileName := range inputFiles {
+		if gj, err = ParseFile(fileName); err != nil {
+			t.Errorf("Failed to parse file: %v", err)
+		}
+		switch gj.(type) {
+		case *Point:
+			geometry1 := gj.(*Point)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case Point:
+			geometry1 := gj.(Point)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case *LineString:
+			geometry1 := gj.(*LineString)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case LineString:
+			geometry1 := gj.(LineString)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case *Polygon:
+			geometry1 := gj.(*Polygon)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case Polygon:
+			geometry1 := gj.(Polygon)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case *MultiPoint:
+			geometry1 := gj.(*MultiPoint)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case MultiPoint:
+			geometry1 := gj.(MultiPoint)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case *MultiLineString:
+			geometry1 := gj.(*MultiLineString)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case MultiLineString:
+			geometry1 := gj.(MultiLineString)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case *MultiPolygon:
+			geometry1 := gj.(*MultiPolygon)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case MultiPolygon:
+			geometry1 := gj.(MultiPolygon)
+			map1 = geometry1.Map()
+			if FromMap(map1) == nil {
+				t.Errorf("Failed to parse file: %v", err)
+			}
+			t.Log(FromMap(map1))
+		case *GeometryCollection:
+			geometry1 := gj.(*GeometryCollection)
+			map1 = geometry1.Map()
+		case GeometryCollection:
+			geometry1 := gj.(GeometryCollection)
+			map1 = geometry1.Map()
+		}
 	}
 
 	if gj, err = ParseFile("test/feature.geojson"); err != nil {
