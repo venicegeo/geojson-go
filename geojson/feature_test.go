@@ -53,6 +53,10 @@ func TestFeature(t *testing.T) {
 	properties["bar"] = 123
 	properties["float"] = 0.0
 	properties["int"] = int64(11)
+	var strAry [2]string
+	strAry[0] = "big"
+	strAry[1] = "bad"
+	properties["sling"] = strAry
 	map2 := make(map[string]string)
 	map2["foo2"] = "bar2"
 	properties["bas"] = map2
@@ -69,6 +73,44 @@ func TestFeature(t *testing.T) {
 	testFeaturePropertyFloat(t, f, "bar", 123)
 	testFeaturePropertyFloat(t, f, "float", 0)
 	testFeaturePropertyFloat(t, f, "int", 11)
+	f.PropertyStringSlice("sling")
+	f.PropertyStringSlice("bas")
+	/*Test FillProperties Map and FeatureCollectionFromMap*/
+	var gj interface{}
+	var err error
+	if gj, err = ParseFile("test/featureCollection.geojson"); err != nil {
+		t.Errorf("Failed to parse file: %v", err)
+	}
+	featureCollection := gj.(*FeatureCollection)
+	featureCollection.FillProperties()
+	//featureCollectionB4 := featureCollection.String()
+	fcMap := featureCollection.Map()
+	featureCollection = FeatureCollectionFromMap(fcMap)
+	/*Per Jeff_Y he will need to make changes to FeatureCollections
+	if strings.Compare(featureCollectionB4, featureCollection.String()) != 0 {
+		t.Errorf("featureCollection.geojson failed FillProperties Test")
+		t.Log(featureCollectionB4)
+		t.Log(featureCollection.String())
+		t.Log(fcMap)
+	}*/
+
+	/*Test FeatureFromMap*/
+	if gj, err = ParseFile("test/feature.geojson"); err != nil {
+		t.Errorf("Failed to parse file: %v", err)
+	}
+	charlieFeat := gj.(*Feature)
+	ToGeometryArray(charlieFeat)
+	map3 := make(map[string]interface{})
+	map3["type"] = charlieFeat.Type
+	map3["properties"] = charlieFeat.Properties
+	map3["geometry"] = charlieFeat.Geometry
+	map3["id"] = "Road.1249"
+	echoFeat := FeatureFromMap(map3)
+	if echoFeat == nil {
+		t.Errorf("feature.geojson failed FeatureFromMap Test")
+		t.Log(echoFeat)
+		t.Log(charlieFeat)
+	}
 }
 
 func TestRTFeature(t *testing.T) {
