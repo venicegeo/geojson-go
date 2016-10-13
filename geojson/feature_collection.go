@@ -18,8 +18,11 @@ package geojson
 
 import "encoding/json"
 
-// FEATURECOLLECTION is a GeoJSON FeatureCollection
-const FEATURECOLLECTION = "FeatureCollection"
+// GeoJSON FeatureCollection constants
+const (
+	FEATURECOLLECTION = "FeatureCollection"
+	FEATURES          = "features"
+)
 
 // The FeatureCollection object represents an array of features
 type FeatureCollection struct {
@@ -74,28 +77,33 @@ func (fc *FeatureCollection) String() string {
 
 // Map returns a map of the FeatureCollection's members
 // This may be useful in wrapping a Feature Collection with foreign members
-func (fc *FeatureCollection) Map() map[string]interface{} {
-	result := make(map[string]interface{})
+func (fc *FeatureCollection) Map() Map {
+	result := make(Map)
 	result["type"] = fc.Type
-	result["features"] = fc.Features
-	result["bbox"] = fc.Bbox
+	features := make([]interface{}, len(fc.Features))
+	for inx, feature := range fc.Features {
+		features[inx] = feature.Map()
+	}
+
+	result[FEATURES] = features
+	result[BBOX] = fc.Bbox
 	return result
 }
 
 // FeatureCollectionFromMap constructs a FeatureCollection from a map
 // and returns its pointer
-func FeatureCollectionFromMap(input map[string]interface{}) *FeatureCollection {
+func FeatureCollectionFromMap(input Map) *FeatureCollection {
 	result := NewFeatureCollection(nil)
-	featuresIfc := input["features"]
+	featuresIfc := input[FEATURES]
 	if featuresArray, ok := featuresIfc.([]interface{}); ok {
 		for _, featureIfc := range featuresArray {
-			if featureMap, ok := featureIfc.(map[string]interface{}); ok {
+			if featureMap, ok := featureIfc.(Map); ok {
 				feature := FeatureFromMap(featureMap)
 				result.Features = append(result.Features, feature)
 			}
 		}
 	}
-	if bboxIfc, ok := input["bbox"]; ok {
+	if bboxIfc, ok := input[BBOX]; ok {
 		result.Bbox, _ = NewBoundingBox(bboxIfc)
 	}
 	return result

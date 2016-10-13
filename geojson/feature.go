@@ -23,16 +23,21 @@ import (
 	"strconv"
 )
 
-// FEATURE is a GeoJSON Feature
-const FEATURE = "Feature"
+// GeoJSON Feature constants
+const (
+	FEATURE    = "Feature"
+	GEOMETRY   = "geometry"
+	PROPERTIES = "properties"
+	ID         = "id"
+)
 
 // The Feature object represents an array of features
 type Feature struct {
-	Type       string                 `json:"type"`
-	Geometry   interface{}            `json:"geometry"`
-	Properties map[string]interface{} `json:"properties,omitempty"`
-	ID         string                 `json:"id,omitempty"`
-	Bbox       BoundingBox            `json:"bbox,omitempty"`
+	Type       string      `json:"type"`
+	Geometry   interface{} `json:"geometry"`
+	Properties Map         `json:"properties,omitempty"`
+	ID         interface{} `json:"id,omitempty"`
+	Bbox       BoundingBox `json:"bbox,omitempty"`
 }
 
 // FeatureFromBytes constructs a Feature from a GeoJSON byte array
@@ -69,19 +74,48 @@ func (feature *Feature) String() string {
 	return result
 }
 
+// IDStr returns the ID as a string
+func (feature *Feature) IDStr() string {
+	if feature.ID == nil {
+		return ""
+	}
+	return fmt.Sprintf("%v", feature.ID)
+}
+
+// Map returns a map of the Feature's members
+// This may be useful in wrapping a Feature with foreign members
+func (feature *Feature) Map() Map {
+	result := make(Map)
+	switch ft := feature.Geometry.(type) {
+	case Mapper:
+		result[GEOMETRY] = ft.Map()
+	case map[string]interface{}:
+		result[GEOMETRY] = Map(ft)
+	case Map:
+		result[GEOMETRY] = ft
+	default:
+		result[GEOMETRY] = nil
+	}
+	result[PROPERTIES] = feature.Properties
+	result[TYPE] = FEATURE
+	result[ID] = feature.ID
+	return result
+}
+
 // NewFeature is the normal factory method for a feature
-func NewFeature(geometry interface{}, id string, properties map[string]interface{}) *Feature {
+// Note that id is expected to be a string or number
+func NewFeature(geometry interface{}, id interface{}, properties Map) *Feature {
 	if properties == nil {
-		properties = make(map[string]interface{})
+		properties = make(Map)
 	}
 	return &Feature{Type: FEATURE, Geometry: geometry, Properties: properties, ID: id}
 }
 
 // ResolveGeometry reconstructs a Feature's geometries
-// since unmarshaled objects come back as interfaces, not real geometries,
+// since unmarshaled objects come back as maps of interfaces, not real geometries
 func (feature *Feature) ResolveGeometry() {
 	if feature.Geometry != nil {
-		if geometry, ok := feature.Geometry.(map[string]interface{}); ok {
+		if geometry, ok := feature.Geometry.(Map); ok {
 			feature.Geometry = NewGeometry(geometry)
 		}
 	}
@@ -200,22 +234,28 @@ func (feature *Feature) PropertyFloat(propertyName string) float64 {
 
 // FeatureFromMap constructs a Feature from a map
 // and returns its pointer
-func FeatureFromMap(input map[string]interface{}) *Feature {
-	var result Feature
-	result.Type = input["type"].(string)
-	result.Properties = input["properties"].(map[string]interface{})
-	result.Geometry = input["geometry"]
-	result.ResolveGeometry()
-	if bboxIfc, ok := input["bbox"]; ok {
-		result.Bbox, _ = NewBoundingBox(bboxIfc)
-	}
-	if id, ok := input["id"]; ok {
-		switch idtype := id.(type) {
-		case string:
-			result.ID = idtype
-		case int:
-			result.ID = strconv.FormatInt(int64(idtype), 10)
+func FeatureFromMap(input Map) *Feature {
+	var (
+		result Feature
+		ok     bool
+	)
+	if result.Type, ok = input[TYPE].(string); ok {
+		result.Properties = input[PROPERTIES].(Map)
+		result.Geometry = input[GEOMETRY]
+		result.ID = input[ID]
+		result.ResolveGeometry()
+		if bboxIfc, ok := input[BBOX]; ok {
+			result.Bbox, _ = NewBoundingBox(bboxIfc)
 		}
+		if id, ok := input[ID]; ok {
+			switch idtype := id.(type) {
+			case string:
+				result.ID = idtype
+			case int:
+				result.ID = strconv.FormatInt(int64(idtype), 10)
+			}
+		}
+		return &result
 	}
-	return &result
+	return nil
 }

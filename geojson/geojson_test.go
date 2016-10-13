@@ -71,30 +71,30 @@ func TestMultiAndColection(t *testing.T) {
 		t.Errorf("Failed to parse file: %v", err)
 	}
 	multiLineString := gj.(*MultiLineString)
-	multiLineString.String()
+	_ = multiLineString.String()
 
 	if gj, err = ParseFile("test/geometrycollection.geojson"); err != nil {
 		t.Errorf("Failed to parse file: %v", err)
 	}
 	geometryCollection := gj.(*GeometryCollection)
-	geometryCollection.String()
+	_ = geometryCollection.String()
 
 	if gj, err = ParseFile("test/multipolygon.geojson"); err != nil {
 		t.Errorf("Failed to parse file: %v", err)
 	}
 	multiPolygon := gj.(*MultiPolygon)
-	multiPolygon.String()
+	_ = multiPolygon.String()
 	if gj, err = ParseFile("test/multipoint.geojson"); err != nil {
 		t.Errorf("Failed to parse file: %v", err)
 	}
 	multiPoint := gj.(*MultiPoint)
-	multiPoint.String()
+	_ = multiPoint.String()
 
 	if gj, err = ParseFile("test/multipolygon2.geojson"); err != nil {
 		t.Errorf("Failed to parse file: %v", err)
 	}
 	multiPolygon2 := gj.(*MultiPolygon)
-	multiPolygon2.String()
+	_ = multiPolygon2.String()
 
 }
 
@@ -139,19 +139,6 @@ func testWriteFile(input map[string]interface{}) error {
 	return err
 }
 
-func TestToGeometryArray(t *testing.T) {
-	var (
-		gj     interface{}
-		err    error
-		result []interface{}
-	)
-	if gj, err = ParseFile("test/sample.geojson"); err != nil {
-		t.Errorf("Failed to parse file: %v", err)
-	}
-	result = ToGeometryArray(gj)
-	fmt.Printf("Geometries: %#v\n", result)
-}
-
 func TestNullInputs(t *testing.T) {
 	bb, _ := NewBoundingBox(nil)
 	if "" != bb.String() {
@@ -166,7 +153,7 @@ func TestNullInputs(t *testing.T) {
 	if fc.String() != `{"type":"FeatureCollection","features":[]}` {
 		t.Errorf("Received %v for empty Feature Collection.", fc.String())
 	}
-	f := NewFeature(nil, "", nil)
+	f := NewFeature(nil, nil, nil)
 	if f.String() != `{"type":"Feature","geometry":null}` {
 		t.Errorf("Received %v for an empty Feature.", f.String())
 	}

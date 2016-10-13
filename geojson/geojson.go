@@ -21,22 +21,27 @@ import (
 	"io/ioutil"
 )
 
-// The GeoJSON object represents a geometry, feature, or collection of features.
-type GeoJSON struct {
-	Type string `json:"type"`
-}
+// The Map object represents a geometry, feature, or collection of features
+// in its native form as a map of objects aligned to the JSON structure
+type Map map[string]interface{}
+
+// GeoJSON Constants
+const (
+	TYPE = "type"
+	BBOX = "bbox"
+)
 
 // Parse parses a GeoJSON string into a GeoJSON object pointer
 func Parse(bytes []byte) (interface{}, error) {
 	var (
 		result interface{}
-		gj     GeoJSON
+		gj     Map
 		err    error
 	)
 	if err = json.Unmarshal(bytes, &gj); err != nil {
 		return nil, err
 	}
-	switch gj.Type {
+	switch gj[TYPE] {
 	case "Point":
 		result, err = PointFromBytes(bytes)
 	case "LineString":
@@ -71,9 +76,9 @@ func ParseFile(filename string) (interface{}, error) {
 	return Parse(bytes)
 }
 
-// FromMap parses a map[string]interface{} containing a GeoJSON string
+// FromMap parses a Map containing a GeoJSON object
 // into a GeoJSON object pointer
-func FromMap(input map[string]interface{}) interface{} {
+func FromMap(input Map) interface{} {
 	var (
 		typeIfc interface{}
 		ok      bool
@@ -108,4 +113,9 @@ func WriteFile(input interface{}, filename string) error {
 		return err
 	}
 	return ioutil.WriteFile(filename, bytes, 0666)
+}
+
+// Mapper is an interface for all GeoJSON objects to return itself as a Map
+type Mapper interface {
+	Map() Map
 }

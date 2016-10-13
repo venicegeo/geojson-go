@@ -48,7 +48,7 @@ func testFeaturePropertyFloat(t *testing.T, f *Feature, prop string, expected fl
 
 // TestFeature tests Feature stuff
 func TestFeature(t *testing.T) {
-	properties := make(map[string]interface{})
+	properties := make(Map)
 	properties["foo"] = "bar"
 	properties["bar"] = 123
 	properties["float"] = 0.0
@@ -110,5 +110,25 @@ func TestFeature(t *testing.T) {
 		t.Errorf("feature.geojson failed FeatureFromMap Test")
 		t.Log(echoFeat)
 		t.Log(charlieFeat)
+	}
+}
+
+func TestRTFeature(t *testing.T) {
+	var (
+		gj     interface{}
+		err    error
+		m      Map
+		f1     *Feature
+		f2     *Feature
+		result = `{"type":"Feature","geometry":{"type":"LineString","coordinates":[[102,0],[103,1],[104,0],[105,1]]},"properties":{"prop0":"value0","prop1":0},"id":98765}`
+	)
+	if gj, err = ParseFile("test/feature.geojson"); err != nil {
+		t.Errorf("Failed to parse file: %v", err)
+	}
+	f1 = gj.(*Feature)
+	m = f1.Map()
+	f2 = FromMap(m).(*Feature)
+	if f2.String() != result {
+		t.Errorf("Round trip feature failed: %v", f2.String())
 	}
 }
