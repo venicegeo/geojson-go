@@ -18,39 +18,23 @@ package geojson
 
 import "testing"
 
-// TestFeatureCollection tests Feature stuff
-func TestFeatureCollection(t *testing.T) {
+// TestRTFC round trips a Feature Collection
+func TestRTFC(t *testing.T) {
 	var (
-		err error
-		gj  interface{}
-		gj2 interface{}
-		fc  *FeatureCollection
-		fcm Map
-		fi  interface{}
-		ok  bool
+		gj     interface{}
+		err    error
+		m      Map
+		fc1    *FeatureCollection
+		fc2    *FeatureCollection
+		result = `{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[102,0.5]},"properties":{"prop0":"value0"}},{"type":"Feature","geometry":{"type":"LineString","coordinates":[[102,0],[103,1],[104,0],[105,1]]},"properties":{"prop0":"value0","prop1":0}},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[100,0],[101,0],[101,1],[100,1],[100,0]]]},"properties":{"prop0":"value0","prop1":{"this":"that"}}}]}`
 	)
-	if gj, err = ParseFile("test/featureCollection.geojson"); err != nil {
-		t.Error(err.Error())
+	if gj, err = ParseFile("test/sample.geojson"); err != nil {
+		t.Errorf("Failed to parse file: %v", err)
 	}
-	if fc, ok = gj.(*FeatureCollection); ok {
-		if len(fc.Features) != 4 {
-			t.Errorf("Expected 4 features, got %v", len(fc.Features))
-		}
-		fcm = fc.Map()
-		if fi, ok = fcm["features"]; ok {
-			if _, ok = fi.([]interface{}); ok {
-
-			} else {
-				t.Errorf("Expected an array of interfaces. %#v", fi)
-			}
-		} else {
-			t.Error("Expected features in map.")
-		}
-		gj2 = FromMap(fcm)
-		if _, ok = gj2.(*FeatureCollection); !ok {
-			t.Errorf("Expected *FeatureCollection, got %T", gj2)
-		}
-	} else {
-		t.Errorf("Expected *FeatureCollection, got %T", gj)
+	fc1 = gj.(*FeatureCollection)
+	m = fc1.Map()
+	fc2 = FromMap(m).(*FeatureCollection)
+	if fc2.String() != result {
+		t.Errorf("Round trip feature failed: %v", fc2.String())
 	}
 }

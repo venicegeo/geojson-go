@@ -33,6 +33,7 @@ const (
 	MULTILINESTRING    = "MultiLineString"
 	MULTIPOLYGON       = "MultiPolygon"
 	GEOMETRYCOLLECTION = "GeometryCollection"
+	GEOMETRIES         = "geometries"
 )
 
 // The Point object contains a single position
@@ -76,6 +77,7 @@ func (point Point) String() string {
 func (point Point) Map() Map {
 	result := make(Map)
 	result[COORDINATES] = point.Coordinates
+	result[TYPE] = POINT
 	return result
 }
 
@@ -157,6 +159,7 @@ func (ls LineString) String() string {
 func (ls LineString) Map() Map {
 	result := make(Map)
 	result[COORDINATES] = ls.Coordinates
+	result[TYPE] = LINESTRING
 	return result
 }
 
@@ -206,6 +209,7 @@ func (polygon Polygon) String() string {
 func (polygon Polygon) Map() Map {
 	result := make(Map)
 	result[COORDINATES] = polygon.Coordinates
+	result[TYPE] = POLYGON
 	return result
 }
 
@@ -255,6 +259,7 @@ func (mp MultiPoint) String() string {
 func (mp MultiPoint) Map() Map {
 	result := make(Map)
 	result[COORDINATES] = mp.Coordinates
+	result[TYPE] = MULTIPOINT
 	return result
 }
 
@@ -304,6 +309,7 @@ func (mls MultiLineString) String() string {
 func (mls MultiLineString) Map() Map {
 	result := make(Map)
 	result[COORDINATES] = mls.Coordinates
+	result[TYPE] = MULTILINESTRING
 	return result
 }
 
@@ -353,6 +359,7 @@ func (mp MultiPolygon) String() string {
 func (mp MultiPolygon) Map() Map {
 	result := make(Map)
 	result[COORDINATES] = mp.Coordinates
+	result[TYPE] = MULTIPOLYGON
 	return result
 }
 
@@ -374,7 +381,7 @@ func GeometryCollectionFromBytes(bytes []byte) (*GeometryCollection, error) {
 	err := json.Unmarshal(bytes, &result)
 	var geometries []interface{}
 	for _, curr := range result.Geometries {
-		gmap := curr.(Map)
+		gmap := curr.(map[string]interface{})
 		geometry := NewGeometry(gmap)
 		geometries = append(geometries, geometry)
 	}
@@ -419,7 +426,8 @@ func (gc GeometryCollection) Map() Map {
 			geometries[inx] = gt.Map()
 		}
 	}
-	result["geometries"] = geometries
+	result[GEOMETRIES] = geometries
+	result[TYPE] = GEOMETRYCOLLECTION
 	return result
 }
 
@@ -434,28 +442,35 @@ func NewGeometryCollection(geometries []interface{}) *GeometryCollection {
 // This quasi-recursive function determines drills into the
 // multidimensional array of interfaces to build a proper
 // coordinate array of the right dimension
-func interfaceArrayToArray(input []interface{}) interface{} {
-	var result interface{}
-	var coords []float64
-	var coords2 [][]float64
-	var coords3 [][][]float64
-	var coords4 [][][][]float64
-	for inx := 0; inx < len(input); inx++ {
-		switch curr1 := input[inx].(type) {
-		case float64:
-			coords = append(coords, curr1)
-			result = coords
-		case []interface{}:
-			switch curr2 := interfaceArrayToArray(curr1).(type) {
-			case []float64:
-				coords2 = append(coords2, curr2)
-				result = coords2
-			case [][]float64:
-				coords3 = append(coords3, curr2)
-				result = coords3
-			case [][][]float64:
-				coords4 = append(coords4, curr2)
-				result = coords4
+func interfaceToArray(input interface{}) interface{} {
+	var (
+		result  interface{}
+		coords  []float64
+		coords2 [][]float64
+		coords3 [][][]float64
+		coords4 [][][][]float64
+	)
+	switch it := input.(type) {
+	case []float64, [][]float64, [][][]float64, [][][][]float64:
+		result = it
+	case []interface{}:
+		for inx := 0; inx < len(it); inx++ {
+			switch curr1 := it[inx].(type) {
+			case float64:
+				coords = append(coords, curr1)
+				result = coords
+			case []interface{}:
+				switch curr2 := interfaceToArray(curr1).(type) {
+				case []float64:
+					coords2 = append(coords2, curr2)
+					result = coords2
+				case [][]float64:
+					coords3 = append(coords3, curr2)
+					result = coords3
+				case [][][]float64:
+					coords4 = append(coords4, curr2)
+					result = coords4
+				}
 			}
 		}
 	}
@@ -467,25 +482,25 @@ func interfaceArrayToArray(input []interface{}) interface{} {
 func NewGeometry(input Map) interface{} {
 	var (
 		result      interface{}
-		coordinates []interface{}
+		coordinates interface{}
 	)
 	if _, ok := input[COORDINATES]; ok {
-		coordinates = input[COORDINATES].([]interface{})
+		coordinates = interfaceToArray(input[COORDINATES])
 	}
-	iType := input["type"].(string)
+	iType := input[TYPE].(string)
 	switch iType {
 	case POINT:
-		result = NewPoint(interfaceArrayToArray(coordinates).([]float64))
+		result = NewPoint(coordinates.([]float64))
 	case LINESTRING:
-		result = NewLineString(interfaceArrayToArray(coordinates).([][]float64))
+		result = NewLineString(coordinates.([][]float64))
 	case POLYGON:
-		result = NewPolygon(interfaceArrayToArray(coordinates).([][][]float64))
+		result = NewPolygon(coordinates.([][][]float64))
 	case MULTIPOINT:
-		result = NewMultiPoint(interfaceArrayToArray(coordinates).([][]float64))
+		result = NewMultiPoint(coordinates.([][]float64))
 	case MULTILINESTRING:
-		result = NewMultiLineString(interfaceArrayToArray(coordinates).([][][]float64))
+		result = NewMultiLineString(coordinates.([][][]float64))
 	case MULTIPOLYGON:
-		result = NewMultiPolygon(interfaceArrayToArray(coordinates).([][][][]float64))
+		result = NewMultiPolygon(coordinates.([][][][]float64))
 	case GEOMETRYCOLLECTION:
 		geometries := input["geometries"].([]interface{})
 		for inx := range geometries {

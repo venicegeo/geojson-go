@@ -21,26 +21,27 @@ import (
 	"io/ioutil"
 )
 
-// The GeoJSON object represents a geometry, feature, or collection of features.
-type GeoJSON struct {
-	Type string `json:"type"`
-}
-
 // The Map object represents a geometry, feature, or collection of features
 // in its native form as a map of objects aligned to the JSON structure
 type Map map[string]interface{}
+
+// GeoJSON Constants
+const (
+	TYPE = "type"
+	BBOX = "bbox"
+)
 
 // Parse parses a GeoJSON string into a GeoJSON object pointer
 func Parse(bytes []byte) (interface{}, error) {
 	var (
 		result interface{}
-		gj     GeoJSON
+		gj     Map
 		err    error
 	)
 	if err = json.Unmarshal(bytes, &gj); err != nil {
 		return nil, err
 	}
-	switch gj.Type {
+	switch gj[TYPE] {
 	case "Point":
 		result, err = PointFromBytes(bytes)
 	case "LineString":

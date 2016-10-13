@@ -86,7 +86,7 @@ func (fc *FeatureCollection) Map() Map {
 	}
 
 	result[FEATURES] = features
-	result["bbox"] = fc.Bbox
+	result[BBOX] = fc.Bbox
 	return result
 }
 
@@ -103,7 +103,7 @@ func FeatureCollectionFromMap(input Map) *FeatureCollection {
 			}
 		}
 	}
-	if bboxIfc, ok := input["bbox"]; ok {
+	if bboxIfc, ok := input[BBOX]; ok {
 		result.Bbox, _ = NewBoundingBox(bboxIfc)
 	}
 	return result
