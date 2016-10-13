@@ -48,7 +48,7 @@ func testFeaturePropertyFloat(t *testing.T, f *Feature, prop string, expected fl
 
 // TestFeature tests Feature stuff
 func TestFeature(t *testing.T) {
-	properties := make(map[string]interface{})
+	properties := make(Map)
 	properties["foo"] = "bar"
 	properties["bar"] = 123
 	properties["float"] = 0.0

@@ -72,6 +72,13 @@ func (point Point) String() string {
 	return result
 }
 
+// Map returns a map of the Geometry's members
+func (point Point) Map() Map {
+	result := make(Map)
+	result[COORDINATES] = point.Coordinates
+	return result
+}
+
 // NewPoint is the normal factory method for a Point
 func NewPoint(coordinates []float64) *Point {
 	if len(coordinates) > 1 {
@@ -146,6 +153,13 @@ func (ls LineString) String() string {
 	return result
 }
 
+// Map returns a map of the Geometry's members
+func (ls LineString) Map() Map {
+	result := make(Map)
+	result[COORDINATES] = ls.Coordinates
+	return result
+}
+
 // NewLineString is the normal factory method for a LineString
 func NewLineString(coordinates [][]float64) *LineString {
 	return &LineString{Type: LINESTRING, Coordinates: coordinates}
@@ -185,6 +199,13 @@ func (polygon Polygon) String() string {
 	} else {
 		result = err.Error()
 	}
+	return result
+}
+
+// Map returns a map of the Geometry's members
+func (polygon Polygon) Map() Map {
+	result := make(Map)
+	result[COORDINATES] = polygon.Coordinates
 	return result
 }
 
@@ -230,6 +251,13 @@ func (mp MultiPoint) String() string {
 	return result
 }
 
+// Map returns a map of the Geometry's members
+func (mp MultiPoint) Map() Map {
+	result := make(Map)
+	result[COORDINATES] = mp.Coordinates
+	return result
+}
+
 // NewMultiPoint is the normal factory method for a MultiPoint
 func NewMultiPoint(coordinates [][]float64) *MultiPoint {
 	return &MultiPoint{Type: MULTIPOINT, Coordinates: coordinates}
@@ -272,7 +300,14 @@ func (mls MultiLineString) String() string {
 	return result
 }
 
-// NewMultiLineString is the normal factory method for a LineString
+// Map returns a map of the Geometry's members
+func (mls MultiLineString) Map() Map {
+	result := make(Map)
+	result[COORDINATES] = mls.Coordinates
+	return result
+}
+
+// NewMultiLineString is the normal factory method for a MultiLineString
 func NewMultiLineString(coordinates [][][]float64) *MultiLineString {
 	return &MultiLineString{Type: MULTILINESTRING, Coordinates: coordinates}
 }
@@ -314,6 +349,13 @@ func (mp MultiPolygon) String() string {
 	return result
 }
 
+// Map returns a map of the Geometry's members
+func (mp MultiPolygon) Map() Map {
+	result := make(Map)
+	result[COORDINATES] = mp.Coordinates
+	return result
+}
+
 // NewMultiPolygon is the normal factory method for a MultiPolygon
 func NewMultiPolygon(coordinates [][][][]float64) *MultiPolygon {
 	return &MultiPolygon{Type: MULTIPOLYGON, Coordinates: coordinates}
@@ -332,7 +374,7 @@ func GeometryCollectionFromBytes(bytes []byte) (*GeometryCollection, error) {
 	err := json.Unmarshal(bytes, &result)
 	var geometries []interface{}
 	for _, curr := range result.Geometries {
-		gmap := curr.(map[string]interface{})
+		gmap := curr.(Map)
 		geometry := NewGeometry(gmap)
 		geometries = append(geometries, geometry)
 	}
@@ -362,6 +404,22 @@ func (gc GeometryCollection) String() string {
 	} else {
 		result = err.Error()
 	}
+	return result
+}
+
+// Map returns a map of the Geometry's members
+func (gc GeometryCollection) Map() Map {
+	result := make(Map)
+	geometries := make([]Map, len(gc.Geometries))
+	for inx, geometry := range gc.Geometries {
+		switch gt := geometry.(type) {
+		case Map:
+			geometries[inx] = gt
+		case Mapper:
+			geometries[inx] = gt.Map()
+		}
+	}
+	result["geometries"] = geometries
 	return result
 }
 
@@ -406,7 +464,7 @@ func interfaceArrayToArray(input []interface{}) interface{} {
 
 // NewGeometry constructs a Geometry from a map that represents a
 // GeoJSON Geometry Object
-func NewGeometry(input map[string]interface{}) interface{} {
+func NewGeometry(input Map) interface{} {
 	var (
 		result      interface{}
 		coordinates []interface{}
@@ -431,7 +489,7 @@ func NewGeometry(input map[string]interface{}) interface{} {
 	case GEOMETRYCOLLECTION:
 		geometries := input["geometries"].([]interface{})
 		for inx := range geometries {
-			geometries[inx] = NewGeometry(geometries[inx].(map[string]interface{}))
+			geometries[inx] = NewGeometry(geometries[inx].(Map))
 		}
 		result = NewGeometryCollection(geometries)
 	}
