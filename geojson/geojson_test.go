@@ -36,6 +36,7 @@ var inputFiles = [...]string{
 	"test/geometrycollection.geojson",
 	"test/sample.geojson",
 	"test/boundingbox.geojson",
+	"test/feature.geojson",
 	"test/featureCollectionWithGeometryCollection.geojson",
 	"test/featureCollection.geojson"}
 

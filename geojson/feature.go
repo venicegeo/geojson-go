@@ -19,6 +19,7 @@ package geojson
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math"
 	"strconv"
 )
@@ -60,6 +61,7 @@ func (feature *Feature) ForceBbox() BoundingBox {
 		return bboxIfc.ForceBbox()
 	}
 
+	log.Printf("Feature %v does not have a Geometry that can be made into a Bounding Box: %t", feature.IDStr(), feature.Geometry)
 	return BoundingBox{}
 }
 
@@ -114,10 +116,11 @@ func NewFeature(geometry interface{}, id interface{}, properties Map) *Feature {
 // ResolveGeometry reconstructs a Feature's geometries
 // since unmarshaled objects come back as maps of interfaces, not real geometries
 func (feature *Feature) ResolveGeometry() {
-	if feature.Geometry != nil {
-		if geometry, ok := feature.Geometry.(Map); ok {
-			feature.Geometry = NewGeometry(geometry)
-		}
+	switch geometry := feature.Geometry.(type) {
+	case Map:
+		feature.Geometry = newGeometry(geometry)
+	case map[string]interface{}:
+		feature.Geometry = newGeometry(Map(geometry))
 	}
 }
 

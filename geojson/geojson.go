@@ -91,7 +91,7 @@ func FromMap(input Map) interface{} {
 		case FEATURECOLLECTION:
 			return FeatureCollectionFromMap(input)
 		default:
-			return NewGeometry(input)
+			return newGeometry(input)
 		}
 
 	}

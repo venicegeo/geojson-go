@@ -48,7 +48,7 @@ func TestRTPoint(t *testing.T) {
 	}
 	p1 = gj.(*Point)
 	m = p1.Map()
-	p2 = NewGeometry(m).(*Point)
+	p2 = FromMap(m).(*Point)
 	if p2.String() != result {
 		t.Errorf("Round trip point failed: %v", p2.String())
 	}

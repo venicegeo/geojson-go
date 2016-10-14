@@ -160,11 +160,23 @@ func TestBBox(t *testing.T) {
 
 }
 
-func TestBbox(t *testing.T) {
-	for inx, fileName := range inputFiles {
-		gj, _ := ParseFile(fileName)
-		bboxIfc := gj.(BoundingBoxIfc)
-		bbox := bboxIfc.ForceBbox()
-		fmt.Printf("%v BBox: %v\n", inx+1, bbox.String())
+func TestBBoxFromFiles(t *testing.T) {
+	for _, fileName := range inputFiles {
+		testBBox(t, fileName)
+	}
+}
+
+func testBBox(t *testing.T, fileName string) {
+	gj, err := ParseFile(fileName)
+	if err != nil {
+		t.Error(err.Error())
+	}
+	bboxIfc := gj.(BoundingBoxIfc)
+	bbox := bboxIfc.ForceBbox()
+	if bbox.Valid() != nil {
+		t.Errorf("Bounding box for %v is invalid.", fileName)
+	}
+	if len(bbox) < 3 {
+		t.Errorf("Bounding box for %v is empty: %v", fileName, gj.(fmt.Stringer).String())
 	}
 }

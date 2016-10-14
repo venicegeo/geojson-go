@@ -382,7 +382,7 @@ func GeometryCollectionFromBytes(bytes []byte) (*GeometryCollection, error) {
 	var geometries []interface{}
 	for _, curr := range result.Geometries {
 		gmap := curr.(map[string]interface{})
-		geometry := NewGeometry(gmap)
+		geometry := newGeometry(gmap)
 		geometries = append(geometries, geometry)
 	}
 	result.Geometries = geometries
@@ -477,36 +477,43 @@ func interfaceToArray(input interface{}) interface{} {
 	return result
 }
 
-// NewGeometry constructs a Geometry from a map that represents a
+// newGeometry constructs a Geometry from an interface that represents a
 // GeoJSON Geometry Object
-func NewGeometry(input Map) interface{} {
+func newGeometry(input interface{}) interface{} {
 	var (
 		result      interface{}
 		coordinates interface{}
 	)
-	if _, ok := input[COORDINATES]; ok {
-		coordinates = interfaceToArray(input[COORDINATES])
-	}
-	iType := input[TYPE].(string)
-	switch iType {
-	case POINT:
-		result = NewPoint(coordinates.([]float64))
-	case LINESTRING:
-		result = NewLineString(coordinates.([][]float64))
-	case POLYGON:
-		result = NewPolygon(coordinates.([][][]float64))
-	case MULTIPOINT:
-		result = NewMultiPoint(coordinates.([][]float64))
-	case MULTILINESTRING:
-		result = NewMultiLineString(coordinates.([][][]float64))
-	case MULTIPOLYGON:
-		result = NewMultiPolygon(coordinates.([][][][]float64))
-	case GEOMETRYCOLLECTION:
-		geometries := input["geometries"].([]interface{})
-		for inx := range geometries {
-			geometries[inx] = NewGeometry(geometries[inx].(Map))
+	switch it := input.(type) {
+	case Map:
+		if _, ok := it[COORDINATES]; ok {
+			coordinates = interfaceToArray(it[COORDINATES])
 		}
-		result = NewGeometryCollection(geometries)
+		iType := it[TYPE].(string)
+		switch iType {
+		case POINT:
+			result = NewPoint(coordinates.([]float64))
+		case LINESTRING:
+			result = NewLineString(coordinates.([][]float64))
+		case POLYGON:
+			result = NewPolygon(coordinates.([][][]float64))
+		case MULTIPOINT:
+			result = NewMultiPoint(coordinates.([][]float64))
+		case MULTILINESTRING:
+			result = NewMultiLineString(coordinates.([][][]float64))
+		case MULTIPOLYGON:
+			result = NewMultiPolygon(coordinates.([][][][]float64))
+		case GEOMETRYCOLLECTION:
+			geometries := it["geometries"].([]interface{})
+			for inx, geometry := range geometries {
+				geometries[inx] = newGeometry(geometry)
+			}
+			result = NewGeometryCollection(geometries)
+		}
+	case map[string]interface{}:
+		return newGeometry(Map(it))
+	case *Point, *LineString, *Polygon, *MultiPoint, *MultiLineString, *MultiPolygon, *GeometryCollection:
+		result = it
 	}
 	return result
 }

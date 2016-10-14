@@ -56,7 +56,15 @@ func NewBoundingBox(input interface{}) (BoundingBox, error) {
 			return NewBoundingBox(strings.Split(inputType, ","))
 		}
 	case []float64:
-		result = append(inputType, inputType[:]...)
+		switch len(inputType) {
+		case 0, 1:
+			// No op
+		case 2:
+			result = append(inputType, inputType[:]...)
+			// Drop extraneous coordinates like measurements that do not pertain to BBoxes
+		default:
+			result = append(inputType[0:3], inputType[0:3]...)
+		}
 	case [][]float64:
 		for _, curr := range inputType {
 			if bbox2, err = NewBoundingBox(curr); err == nil {
