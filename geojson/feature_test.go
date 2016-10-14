@@ -48,7 +48,7 @@ func testFeaturePropertyFloat(t *testing.T, f *Feature, prop string, expected fl
 
 // TestFeature tests Feature stuff
 func TestFeature(t *testing.T) {
-	properties := make(Map)
+	properties := make(map[string]interface{})
 	properties["foo"] = "bar"
 	properties["bar"] = 123
 	properties["float"] = 0.0
@@ -117,7 +117,7 @@ func TestRTFeature(t *testing.T) {
 	var (
 		gj     interface{}
 		err    error
-		m      Map
+		m      map[string]interface{}
 		f1     *Feature
 		f2     *Feature
 		result = `{"type":"Feature","geometry":{"type":"LineString","coordinates":[[102,0],[103,1],[104,0],[105,1]]},"properties":{"prop0":"value0","prop1":0},"id":98765}`

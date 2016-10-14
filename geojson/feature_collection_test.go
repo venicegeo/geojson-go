@@ -23,7 +23,7 @@ func TestRTFC(t *testing.T) {
 	var (
 		gj     interface{}
 		err    error
-		m      Map
+		m      map[string]interface{}
 		fc1    *FeatureCollection
 		fc2    *FeatureCollection
 		result = `{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[102,0.5]},"properties":{"prop0":"value0"}},{"type":"Feature","geometry":{"type":"LineString","coordinates":[[102,0],[103,1],[104,0],[105,1]]},"properties":{"prop0":"value0","prop1":0}},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[100,0],[101,0],[101,1],[100,1],[100,0]]]},"properties":{"prop0":"value0","prop1":{"this":"that"}}}]}`

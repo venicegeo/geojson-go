@@ -74,8 +74,8 @@ func (point Point) String() string {
 }
 
 // Map returns a map of the Geometry's members
-func (point Point) Map() Map {
-	result := make(Map)
+func (point Point) Map() map[string]interface{} {
+	result := make(map[string]interface{})
 	result[COORDINATES] = point.Coordinates
 	result[TYPE] = POINT
 	return result
@@ -156,8 +156,8 @@ func (ls LineString) String() string {
 }
 
 // Map returns a map of the Geometry's members
-func (ls LineString) Map() Map {
-	result := make(Map)
+func (ls LineString) Map() map[string]interface{} {
+	result := make(map[string]interface{})
 	result[COORDINATES] = ls.Coordinates
 	result[TYPE] = LINESTRING
 	return result
@@ -206,8 +206,8 @@ func (polygon Polygon) String() string {
 }
 
 // Map returns a map of the Geometry's members
-func (polygon Polygon) Map() Map {
-	result := make(Map)
+func (polygon Polygon) Map() map[string]interface{} {
+	result := make(map[string]interface{})
 	result[COORDINATES] = polygon.Coordinates
 	result[TYPE] = POLYGON
 	return result
@@ -256,8 +256,8 @@ func (mp MultiPoint) String() string {
 }
 
 // Map returns a map of the Geometry's members
-func (mp MultiPoint) Map() Map {
-	result := make(Map)
+func (mp MultiPoint) Map() map[string]interface{} {
+	result := make(map[string]interface{})
 	result[COORDINATES] = mp.Coordinates
 	result[TYPE] = MULTIPOINT
 	return result
@@ -306,8 +306,8 @@ func (mls MultiLineString) String() string {
 }
 
 // Map returns a map of the Geometry's members
-func (mls MultiLineString) Map() Map {
-	result := make(Map)
+func (mls MultiLineString) Map() map[string]interface{} {
+	result := make(map[string]interface{})
 	result[COORDINATES] = mls.Coordinates
 	result[TYPE] = MULTILINESTRING
 	return result
@@ -356,8 +356,8 @@ func (mp MultiPolygon) String() string {
 }
 
 // Map returns a map of the Geometry's members
-func (mp MultiPolygon) Map() Map {
-	result := make(Map)
+func (mp MultiPolygon) Map() map[string]interface{} {
+	result := make(map[string]interface{})
 	result[COORDINATES] = mp.Coordinates
 	result[TYPE] = MULTIPOLYGON
 	return result
@@ -415,12 +415,12 @@ func (gc GeometryCollection) String() string {
 }
 
 // Map returns a map of the Geometry's members
-func (gc GeometryCollection) Map() Map {
-	result := make(Map)
-	geometries := make([]Map, len(gc.Geometries))
+func (gc GeometryCollection) Map() map[string]interface{} {
+	result := make(map[string]interface{})
+	geometries := make([]map[string]interface{}, len(gc.Geometries))
 	for inx, geometry := range gc.Geometries {
 		switch gt := geometry.(type) {
-		case Map:
+		case map[string]interface{}:
 			geometries[inx] = gt
 		case Mapper:
 			geometries[inx] = gt.Map()
@@ -485,7 +485,7 @@ func newGeometry(input interface{}) interface{} {
 		coordinates interface{}
 	)
 	switch it := input.(type) {
-	case Map:
+	case map[string]interface{}:
 		if _, ok := it[COORDINATES]; ok {
 			coordinates = interfaceToArray(it[COORDINATES])
 		}
@@ -510,8 +510,6 @@ func newGeometry(input interface{}) interface{} {
 			}
 			result = NewGeometryCollection(geometries)
 		}
-	case map[string]interface{}:
-		return newGeometry(Map(it))
 	case *Point, *LineString, *Polygon, *MultiPoint, *MultiLineString, *MultiPolygon, *GeometryCollection:
 		result = it
 	}

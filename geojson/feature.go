@@ -34,11 +34,11 @@ const (
 
 // The Feature object represents an array of features
 type Feature struct {
-	Type       string      `json:"type"`
-	Geometry   interface{} `json:"geometry"`
-	Properties Map         `json:"properties,omitempty"`
-	ID         interface{} `json:"id,omitempty"`
-	Bbox       BoundingBox `json:"bbox,omitempty"`
+	Type       string                 `json:"type"`
+	Geometry   interface{}            `json:"geometry"`
+	Properties map[string]interface{} `json:"properties,omitempty"`
+	ID         interface{}            `json:"id,omitempty"`
+	Bbox       BoundingBox            `json:"bbox,omitempty"`
 }
 
 // FeatureFromBytes constructs a Feature from a GeoJSON byte array
@@ -86,14 +86,12 @@ func (feature *Feature) IDStr() string {
 
 // Map returns a map of the Feature's members
 // This may be useful in wrapping a Feature with foreign members
-func (feature *Feature) Map() Map {
-	result := make(Map)
+func (feature *Feature) Map() map[string]interface{} {
+	result := make(map[string]interface{})
 	switch ft := feature.Geometry.(type) {
 	case Mapper:
 		result[GEOMETRY] = ft.Map()
 	case map[string]interface{}:
-		result[GEOMETRY] = Map(ft)
-	case Map:
 		result[GEOMETRY] = ft
 	default:
 		result[GEOMETRY] = nil
@@ -106,9 +104,9 @@ func (feature *Feature) Map() Map {
 
 // NewFeature is the normal factory method for a feature
 // Note that id is expected to be a string or number
-func NewFeature(geometry interface{}, id interface{}, properties Map) *Feature {
+func NewFeature(geometry interface{}, id interface{}, properties map[string]interface{}) *Feature {
 	if properties == nil {
-		properties = make(Map)
+		properties = make(map[string]interface{})
 	}
 	return &Feature{Type: FEATURE, Geometry: geometry, Properties: properties, ID: id}
 }
@@ -232,13 +230,15 @@ func (feature *Feature) PropertyFloat(propertyName string) float64 {
 
 // FeatureFromMap constructs a Feature from a map
 // and returns its pointer
-func FeatureFromMap(input Map) *Feature {
+func FeatureFromMap(input map[string]interface{}) *Feature {
 	var (
 		result Feature
 		ok     bool
 	)
 	if result.Type, ok = input[TYPE].(string); ok {
-		result.Properties = input[PROPERTIES].(Map)
+		if _, ok = input[PROPERTIES].(map[string]interface{}); ok {
+			result.Properties = input[PROPERTIES].(map[string]interface{})
+		}
 		result.Geometry = input[GEOMETRY]
 		result.ID = input[ID]
 		result.ResolveGeometry()

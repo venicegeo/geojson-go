@@ -38,7 +38,7 @@ func TestRTPoint(t *testing.T) {
 	var (
 		gj     interface{}
 		err    error
-		m      Map
+		m      map[string]interface{}
 		p1     *Point
 		p2     *Point
 		result = `{"type":"Point","coordinates":[100,0]}`

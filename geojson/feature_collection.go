@@ -16,7 +16,10 @@ limitations under the License.
 
 package geojson
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"log"
+)
 
 // GeoJSON FeatureCollection constants
 const (
@@ -77,8 +80,8 @@ func (fc *FeatureCollection) String() string {
 
 // Map returns a map of the FeatureCollection's members
 // This may be useful in wrapping a Feature Collection with foreign members
-func (fc *FeatureCollection) Map() Map {
-	result := make(Map)
+func (fc *FeatureCollection) Map() map[string]interface{} {
+	result := make(map[string]interface{})
 	result["type"] = fc.Type
 	features := make([]interface{}, len(fc.Features))
 	for inx, feature := range fc.Features {
@@ -92,16 +95,19 @@ func (fc *FeatureCollection) Map() Map {
 
 // FeatureCollectionFromMap constructs a FeatureCollection from a map
 // and returns its pointer
-func FeatureCollectionFromMap(input Map) *FeatureCollection {
+func FeatureCollectionFromMap(input map[string]interface{}) *FeatureCollection {
 	result := NewFeatureCollection(nil)
 	featuresIfc := input[FEATURES]
-	if featuresArray, ok := featuresIfc.([]interface{}); ok {
-		for _, featureIfc := range featuresArray {
-			if featureMap, ok := featureIfc.(Map); ok {
+	log.Printf("featuresIfc type %t", featuresIfc)
+	switch it := featuresIfc.(type) {
+	case []interface{}:
+		for _, featureIfc := range it {
+			if featureMap, ok := featureIfc.(map[string]interface{}); ok {
 				feature := FeatureFromMap(featureMap)
 				result.Features = append(result.Features, feature)
 			}
 		}
+	case []map[string]interface{}:
 	}
 	if bboxIfc, ok := input[BBOX]; ok {
 		result.Bbox, _ = NewBoundingBox(bboxIfc)
