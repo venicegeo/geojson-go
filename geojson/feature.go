@@ -116,12 +116,7 @@ func NewFeature(geometry interface{}, id interface{}, properties Map) *Feature {
 // ResolveGeometry reconstructs a Feature's geometries
 // since unmarshaled objects come back as maps of interfaces, not real geometries
 func (feature *Feature) ResolveGeometry() {
-	switch geometry := feature.Geometry.(type) {
-	case Map:
-		feature.Geometry = newGeometry(geometry)
-	case map[string]interface{}:
-		feature.Geometry = newGeometry(Map(geometry))
-	}
+	feature.Geometry = newGeometry(feature.Geometry)
 }
 
 func stringify(input interface{}) string {
