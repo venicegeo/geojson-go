@@ -585,7 +585,6 @@ func parseWKTPredicate(input string) interface{} {
 		var result2 [][]float64
 		var result3 [][][]float64
 		for _, part := range strings.Split(parts[1], ")") {
-			// fmt.Printf("Part: %s\n", part)
 			if strings.Index(part, "(") >= 0 {
 				currIfc := parseWKTPredicate(part)
 				switch curr := currIfc.(type) {

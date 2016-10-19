@@ -16,10 +16,7 @@ limitations under the License.
 
 package geojson
 
-import (
-	"encoding/json"
-	"log"
-)
+import "encoding/json"
 
 // GeoJSON FeatureCollection constants
 const (
@@ -98,7 +95,6 @@ func (fc *FeatureCollection) Map() map[string]interface{} {
 func FeatureCollectionFromMap(input map[string]interface{}) *FeatureCollection {
 	result := NewFeatureCollection(nil)
 	featuresIfc := input[FEATURES]
-	log.Printf("featuresIfc type %t", featuresIfc)
 	switch it := featuresIfc.(type) {
 	case []interface{}:
 		for _, featureIfc := range it {
