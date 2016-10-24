@@ -17,11 +17,14 @@ limitations under the License.
 package geojson
 
 import (
+	"fmt"
 	"math"
+	"strings"
 	"testing"
 )
 
 type functor func(string)
+type Nato int
 
 func testFeaturePropertyString(t *testing.T, f *Feature, prop, expected string) {
 	if f.PropertyString(prop) != expected {
@@ -83,34 +86,70 @@ func TestFeature(t *testing.T) {
 	}
 	featureCollection := gj.(*FeatureCollection)
 	featureCollection.FillProperties()
-	//featureCollectionB4 := featureCollection.String()
 	fcMap := featureCollection.Map()
 	featureCollection = FeatureCollectionFromMap(fcMap)
-	/*Per Jeff_Y he will need to make changes to FeatureCollections
-	if strings.Compare(featureCollectionB4, featureCollection.String()) != 0 {
-		t.Errorf("featureCollection.geojson failed FillProperties Test")
-		t.Log(featureCollectionB4)
-		t.Log(featureCollection.String())
-		t.Log(fcMap)
-	}*/
-
 	/*Test FeatureFromMap*/
 	if gj, err = ParseFile("test/feature.geojson"); err != nil {
 		t.Errorf("Failed to parse file: %v", err)
 	}
-	charlieFeat := gj.(*Feature)
-	ToGeometryArray(charlieFeat)
+	Feat1 := gj.(*Feature)
+	ToGeometryArray(Feat1)
 	map3 := make(map[string]interface{})
-	map3["type"] = charlieFeat.Type
-	map3["properties"] = charlieFeat.Properties
-	map3["geometry"] = charlieFeat.Geometry
-	map3["id"] = "Road.1249"
-	echoFeat := FeatureFromMap(map3)
-	if echoFeat == nil {
-		t.Errorf("feature.geojson failed FeatureFromMap Test")
-		t.Log(echoFeat)
-		t.Log(charlieFeat)
+	map3["type"] = Feat1.Type
+	map3["properties"] = Feat1.Properties
+	map3["geometry"] = Feat1.Geometry
+	if strings.Compare(Feat1.IDStr(), "98765") != 0 {
+		t.Errorf("Feature was read with a 98765 id and a %v was returned", Feat1.IDStr())
 	}
+	map3["id"] = 1234
+	Feat2 := FeatureFromMap(map3)
+	map3["id"] = "1234"
+	Feat2 = FeatureFromMap(map3)
+	map3["id"] = nil
+	Feat2 = FeatureFromMap(map3)
+	if strings.Compare(Feat2.IDStr(), "") != 0 {
+		t.Errorf("Feature was given an id of nil and %v was returned", Feat2.IDStr())
+	}
+	if Feat2 == nil {
+		t.Errorf("feature.geojson failed FeatureFromMap Test")
+		t.Log(Feat1)
+		t.Log(Feat2)
+	}
+	//Test Floatify Stringify and intify
+	stringer1 := Nato(1)
+	float321 := float32(5.1)
+	float641 := float64(6.1)
+	int1 := 1
+	int641 := int64(1)
+	string1 := "Test"
+	interfaceLoop := make([]interface{}, 6)
+	interfaceLoop[0] = stringer1
+	interfaceLoop[1] = float321
+	interfaceLoop[2] = float641
+	interfaceLoop[3] = int1
+	interfaceLoop[4] = int641
+	interfaceLoop[5] = string1
+
+	for index, element := range interfaceLoop {
+		t.Log(stringify(element))
+		t.Log(intify(element))
+		t.Log(floatify(element))
+		t.Log(index)
+	}
+
+}
+func (p Nato) String() string {
+	switch p {
+	case 1:
+		return "A"
+	case 2:
+		return "B"
+	case 3:
+		return "C"
+	case 4:
+		return "D"
+	}
+	return fmt.Sprintf("Pill(%d)", p)
 }
 
 func TestRTFeature(t *testing.T) {
