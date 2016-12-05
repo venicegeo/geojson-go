@@ -25,6 +25,7 @@ import (
 const bbox0 = ""
 const bbox1 = "10,10,20,20"
 const bbox2 = "10,10,20,20,30"
+const bbox2b = "10,40,20,30"
 const bbox3 = "10,10,20,foo"
 const bbox4 = "10,10,20,20,30,30"
 const bbox5 = "40,10,20,20,30,30"
@@ -56,6 +57,12 @@ func TestBBox(t *testing.T) {
 	if bbox.Valid() != nil {
 		t.Errorf("\"%v\" is supposed to be a valid bounding box.", bbox1)
 	}
+	if bbox.Polygon() == nil {
+		t.Errorf("\"%v\" is supposed to transformable into a Polygon.", bbox1)
+	}
+	if len(bbox.String()) != 27 {
+		t.Errorf("Unexpected string form of \"%v\": \"%v\"", bbox1, bbox.String())
+	}
 	if otherBbox, err = NewBoundingBox(bbox1clone); err != nil {
 		t.Error(err)
 	}
@@ -68,6 +75,9 @@ func TestBBox(t *testing.T) {
 	if _, err = NewBoundingBox(bbox2); err == nil {
 		t.Errorf("\"%v\" is supposed to be an invalid bounding box.", bbox2)
 	}
+	if _, err = NewBoundingBox(bbox2b); err == nil {
+		t.Errorf("\"%v\" is supposed to be an invalid bounding box.", bbox2b)
+	}
 	if _, err = NewBoundingBox(bbox3); err == nil {
 		t.Errorf("\"%v\" is supposed to be an invalid bounding box.", bbox3)
 	}
@@ -76,6 +86,12 @@ func TestBBox(t *testing.T) {
 	}
 	if bbox.Valid() != nil {
 		t.Errorf("\"%v\" is supposed to be a valid bounding box but it returned %v.", bbox4, bbox.Valid().Error())
+	}
+	if bbox.Centroid() == nil {
+		t.Errorf("\"%v\" is supposed to have a centroid.", bbox4)
+	}
+	if len(bbox.String()) != 41 {
+		t.Errorf("Unexpected string form of \"%v\": \"%v\"", bbox4, bbox.String())
 	}
 	if bbox, err = NewBoundingBox(bbox5); err != nil {
 		t.Error(err)

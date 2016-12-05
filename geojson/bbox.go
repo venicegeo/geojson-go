@@ -226,18 +226,16 @@ func (bb BoundingBox) Valid() error {
 
 // Antimeridian returns true if the BoundingBox crosses the antimeridian
 func (bb BoundingBox) Antimeridian() bool {
-	if bb.Valid() != nil {
-		return false
-	}
-	switch len(bb) {
-	case 0:
-	case 4:
-		if bb[0] > bb[2] {
-			return true
-		}
-	case 6:
-		if bb[0] > bb[3] {
-			return true
+	if bb.Valid() == nil {
+		switch len(bb) {
+		case 4:
+			if bb[0] > bb[2] {
+				return true
+			}
+		case 6:
+			if bb[0] > bb[3] {
+				return true
+			}
 		}
 	}
 	return false
@@ -262,6 +260,34 @@ func (bb BoundingBox) Centroid() *Point {
 			coordinates[2] = 0.5 * (bb[2] + bb[5])
 			result = NewPoint(coordinates[0:])
 		}
+	}
+	return result
+}
+
+// Polygon returns the BoundingBox as a GeoJSON Polygon
+// if the BoundingBox is two-dimensional
+func (bb BoundingBox) Polygon() *Polygon {
+	var result *Polygon
+	switch len(bb) {
+	case 4:
+		coordinates := make([][][]float64, 1)
+		coordinates[0] = make([][]float64, 5)
+		coordinates[0][0] = make([]float64, 2)
+		coordinates[0][0][0] = bb[0]
+		coordinates[0][0][1] = bb[1]
+		coordinates[0][1] = make([]float64, 2)
+		coordinates[0][1][0] = bb[2]
+		coordinates[0][1][1] = bb[1]
+		coordinates[0][2] = make([]float64, 2)
+		coordinates[0][2][0] = bb[2]
+		coordinates[0][2][1] = bb[3]
+		coordinates[0][3] = make([]float64, 2)
+		coordinates[0][3][0] = bb[0]
+		coordinates[0][3][1] = bb[3]
+		coordinates[0][4] = make([]float64, 2)
+		coordinates[0][4][0] = bb[0]
+		coordinates[0][4][1] = bb[1]
+		result = NewPolygon(coordinates)
 	}
 	return result
 }
