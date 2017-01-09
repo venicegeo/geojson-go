@@ -516,6 +516,41 @@ func newGeometry(input interface{}) interface{} {
 	return result
 }
 
+func interfaceTo2DArray(gjObject interface{}) [][]float64 {
+	var (
+		result [][]float64
+	)
+	switch typedGJ := gjObject.(type) {
+	case *Point:
+		result = append(result, typedGJ.Coordinates)
+	case *LineString:
+		result = typedGJ.Coordinates
+	case *MultiPoint:
+		result = typedGJ.Coordinates
+	case *MultiLineString:
+		for _, c3 := range typedGJ.Coordinates {
+			result = append(result, c3...)
+		}
+	case *Polygon:
+		for _, c3 := range typedGJ.Coordinates {
+			result = append(result, c3...)
+		}
+	case *Feature:
+		result = interfaceTo2DArray(typedGJ.Geometry)
+	case *FeatureCollection:
+		for _, feature := range typedGJ.Features {
+			result = append(result, interfaceTo2DArray(feature)...)
+		}
+	}
+
+	return result
+}
+
+// ToMultiPoint converts the geometry into a MultiPoint
+func ToMultiPoint(gjObject interface{}) *MultiPoint {
+	return NewMultiPoint(interfaceTo2DArray(gjObject))
+}
+
 // ToGeometryArray takes a GeoJSON object and returns an array of
 // its constituent geometry objects
 func ToGeometryArray(gjObject interface{}) []interface{} {

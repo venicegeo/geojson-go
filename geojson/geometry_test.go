@@ -53,3 +53,16 @@ func TestRTPoint(t *testing.T) {
 		t.Errorf("Round trip point failed: %v", p2.String())
 	}
 }
+
+func TestToMultiPoint(t *testing.T) {
+	var (
+		gj     interface{}
+		err    error
+		result *MultiPoint
+	)
+	if gj, err = ParseFile("test/sample.geojson"); err != nil {
+		t.Errorf("Failed to parse file: %v", err)
+	}
+	result = ToMultiPoint(gj)
+	fmt.Printf("Found %v points.\n%#v\n", len(result.Coordinates), result)
+}
