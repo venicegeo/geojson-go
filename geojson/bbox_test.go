@@ -34,6 +34,7 @@ const bbox7 = "-180,10,-170,20"
 const bbox8 = "170,10,180,20"
 const bbox9 = "-180,-70,-179,70"
 const bbox1clone = "10,10,20,20"
+const bbox11 = "15,15,15,15"
 
 // TestGeoJSON tests GeoJSON readers
 func TestBBox(t *testing.T) {
@@ -57,7 +58,11 @@ func TestBBox(t *testing.T) {
 	if bbox.Valid() != nil {
 		t.Errorf("\"%v\" is supposed to be a valid bounding box.", bbox1)
 	}
-	if bbox.Polygon() == nil {
+	gjIfc = bbox.Geometry()
+	if gjIfc == nil {
+		t.Errorf("\"%v\" is supposed to transformable into a Polygon.", bbox1)
+	}
+	if _, ok = gjIfc.(*Polygon); !ok {
 		t.Errorf("\"%v\" is supposed to transformable into a Polygon.", bbox1)
 	}
 	if len(bbox.String()) != 27 {
@@ -173,7 +178,19 @@ func TestBBox(t *testing.T) {
 	} else {
 		t.Errorf("Expected *FeatureCollection, got %T", gjIfc)
 	}
-
+	if bbox, err = NewBoundingBox(bbox11); err != nil {
+		t.Error(err)
+	}
+	if bbox.Valid() != nil {
+		t.Errorf("\"%v\" is supposed to be a valid bounding box.", bbox11)
+	}
+	gjIfc = bbox.Geometry()
+	if gjIfc == nil {
+		t.Errorf("\"%v\" is supposed to transformable into a Point.", bbox11)
+	}
+	if _, ok = gjIfc.(*Point); !ok {
+		t.Errorf("\"%v\" is supposed to transformable into a Point.", bbox11)
+	}
 }
 
 func TestBBoxFromFiles(t *testing.T) {

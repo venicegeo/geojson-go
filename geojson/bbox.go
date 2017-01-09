@@ -264,30 +264,35 @@ func (bb BoundingBox) Centroid() *Point {
 	return result
 }
 
-// Polygon returns the BoundingBox as a GeoJSON Polygon
+// Geometry returns the BoundingBox as a GeoJSON object
+// (point, line, or polygon)
 // if the BoundingBox is two-dimensional
-func (bb BoundingBox) Polygon() *Polygon {
-	var result *Polygon
+func (bb BoundingBox) Geometry() interface{} {
+	var result interface{}
 	switch len(bb) {
 	case 4:
-		coordinates := make([][][]float64, 1)
-		coordinates[0] = make([][]float64, 5)
-		coordinates[0][0] = make([]float64, 2)
-		coordinates[0][0][0] = bb[0]
-		coordinates[0][0][1] = bb[1]
-		coordinates[0][1] = make([]float64, 2)
-		coordinates[0][1][0] = bb[2]
-		coordinates[0][1][1] = bb[1]
-		coordinates[0][2] = make([]float64, 2)
-		coordinates[0][2][0] = bb[2]
-		coordinates[0][2][1] = bb[3]
-		coordinates[0][3] = make([]float64, 2)
-		coordinates[0][3][0] = bb[0]
-		coordinates[0][3][1] = bb[3]
-		coordinates[0][4] = make([]float64, 2)
-		coordinates[0][4][0] = bb[0]
-		coordinates[0][4][1] = bb[1]
-		result = NewPolygon(coordinates)
+		if (bb[0] == bb[2]) && (bb[1] == bb[3]) {
+			result = NewPoint(bb[0:2])
+		} else {
+			coordinates := make([][][]float64, 1)
+			coordinates[0] = make([][]float64, 5)
+			coordinates[0][0] = make([]float64, 2)
+			coordinates[0][0][0] = bb[0]
+			coordinates[0][0][1] = bb[1]
+			coordinates[0][1] = make([]float64, 2)
+			coordinates[0][1][0] = bb[2]
+			coordinates[0][1][1] = bb[1]
+			coordinates[0][2] = make([]float64, 2)
+			coordinates[0][2][0] = bb[2]
+			coordinates[0][2][1] = bb[3]
+			coordinates[0][3] = make([]float64, 2)
+			coordinates[0][3][0] = bb[0]
+			coordinates[0][3][1] = bb[3]
+			coordinates[0][4] = make([]float64, 2)
+			coordinates[0][4][0] = bb[0]
+			coordinates[0][4][1] = bb[1]
+			result = NewPolygon(coordinates)
+		}
 	}
 	return result
 }
