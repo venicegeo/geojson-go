@@ -17,12 +17,11 @@ limitations under the License.
 package geojson
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-
-	"github.com/venicegeo/pzsvc-lib"
 )
 
 // FromWFS returns a Feature Collection from the WFS provided.
@@ -51,7 +50,12 @@ func FromWFS(wfsURL, featureType string) (*FeatureCollection, error) {
 	if request, err = http.NewRequest("GET", qurl, nil); err != nil {
 		return result, err
 	}
-	if response, err = pzsvc.HTTPClient().Do(request); err != nil {
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	httpClient := http.Client{Transport: transport}
+	if response, err = httpClient.Do(request); err != nil {
 		return result, err
 	}
 
@@ -60,13 +64,12 @@ func FromWFS(wfsURL, featureType string) (*FeatureCollection, error) {
 
 	// Check for HTTP errors
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		message := fmt.Sprintf("Received %v: \"%v\" when performing a GetFeature request on %v\n%v", response.StatusCode, response.Status, qurl, string(b))
-		return result, &pzsvc.HTTPError{Status: response.StatusCode, Message: message}
+		return result, fmt.Errorf("Received %v: \"%v\" when performing a GetFeature request on %v\n%v", response.StatusCode, response.Status, qurl, string(b))
 	}
 
 	gjIfc, _ := Parse(b)
 	if result, ok = gjIfc.(*FeatureCollection); ok {
 		return result, nil
 	}
-	return result, pzsvc.ErrWithTrace(fmt.Sprintf("Did not receive valid GeoJSON on request %v", qurl))
+	return result, fmt.Errorf("Did not receive valid GeoJSON on request %v", qurl)
 }
