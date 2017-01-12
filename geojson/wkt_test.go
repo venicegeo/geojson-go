@@ -113,6 +113,5 @@ func TestWriteWKT(t *testing.T) {
 		} else {
 			t.Fatal(err)
 		}
-		t.Fail()
 	}
 }
