@@ -36,6 +36,11 @@ const (
 	GEOMETRIES         = "geometries"
 )
 
+// The WKTer interface allows export as a WKT string
+type WKTer interface {
+	WKT() string
+}
+
 // The Point object contains a single position
 type Point struct {
 	Type        string      `json:"type"`
@@ -105,19 +110,6 @@ func (point Point) WKT() string {
 	return result
 }
 
-func array1ToWKTCoordinates(input []float64) string {
-	var result string
-	switch len(input) {
-	case 2:
-		result = fmt.Sprintf("%f %f", input[0], input[1])
-	case 3:
-		result = fmt.Sprintf("%f %f %f", input[0], input[1], input[2])
-	case 4:
-		result = fmt.Sprintf("%f %f %f %f", input[0], input[1], input[2], input[3])
-	}
-	return result
-}
-
 // The LineString object contains a array of two or more positions
 type LineString struct {
 	Type        string      `json:"type"`
@@ -166,6 +158,18 @@ func (ls LineString) Map() map[string]interface{} {
 // NewLineString is the normal factory method for a LineString
 func NewLineString(coordinates [][]float64) *LineString {
 	return &LineString{Type: LINESTRING, Coordinates: coordinates}
+}
+
+// WKT returns the Well Known Text representation of the linestring
+func (ls LineString) WKT() string {
+	var result string
+	switch len(ls.Coordinates) {
+	case 0:
+		result = "LINESTRING EMPTY"
+	default:
+		result = fmt.Sprintf("LINESTRING (%v)", array2ToWKTCoordinates(ls.Coordinates))
+	}
+	return result
 }
 
 // The Polygon object contains a array of one or more linear rings
@@ -218,6 +222,18 @@ func NewPolygon(coordinates [][][]float64) *Polygon {
 	return &Polygon{Type: POLYGON, Coordinates: coordinates}
 }
 
+// WKT returns the Well Known Text representation of the polygon
+func (polygon Polygon) WKT() string {
+	var result string
+	switch len(polygon.Coordinates) {
+	case 0:
+		result = "POLYGON EMPTY"
+	default:
+		result = fmt.Sprintf("POLYGON (%v)", array3ToWKTCoordinates(polygon.Coordinates))
+	}
+	return result
+}
+
 // The MultiPoint object contains a array of one or more points
 type MultiPoint struct {
 	Type        string      `json:"type"`
@@ -266,6 +282,18 @@ func (mp MultiPoint) Map() map[string]interface{} {
 // NewMultiPoint is the normal factory method for a MultiPoint
 func NewMultiPoint(coordinates [][]float64) *MultiPoint {
 	return &MultiPoint{Type: MULTIPOINT, Coordinates: coordinates}
+}
+
+// WKT returns the Well Known Text representation of the multipoint
+func (mp MultiPoint) WKT() string {
+	var result string
+	switch len(mp.Coordinates) {
+	case 0:
+		result = "MULTIPOINT EMPTY"
+	default:
+		result = fmt.Sprintf("MULTIPOINT (%v)", array2ToWKTCoordinates(mp.Coordinates))
+	}
+	return result
 }
 
 // The MultiLineString object contains a array of one or more line strings
@@ -318,6 +346,18 @@ func NewMultiLineString(coordinates [][][]float64) *MultiLineString {
 	return &MultiLineString{Type: MULTILINESTRING, Coordinates: coordinates}
 }
 
+// WKT returns the Well Known Text representation of the multilinestring
+func (mls MultiLineString) WKT() string {
+	var result string
+	switch len(mls.Coordinates) {
+	case 0:
+		result = "MULTILINESTRING EMPTY"
+	default:
+		result = fmt.Sprintf("MULTILINESTRING (%v)", array3ToWKTCoordinates(mls.Coordinates))
+	}
+	return result
+}
+
 // The MultiPolygon object contains a array of one or more polygons
 type MultiPolygon struct {
 	Type        string          `json:"type"`
@@ -366,6 +406,18 @@ func (mp MultiPolygon) Map() map[string]interface{} {
 // NewMultiPolygon is the normal factory method for a MultiPolygon
 func NewMultiPolygon(coordinates [][][][]float64) *MultiPolygon {
 	return &MultiPolygon{Type: MULTIPOLYGON, Coordinates: coordinates}
+}
+
+// WKT returns the Well Known Text representation of the multipolygon
+func (mp MultiPolygon) WKT() string {
+	var result string
+	switch len(mp.Coordinates) {
+	case 0:
+		result = "MULTIPOLYGON EMPTY"
+	default:
+		result = fmt.Sprintf("MULTIPOLYGON (%v)", array4ToWKTCoordinates(mp.Coordinates))
+	}
+	return result
 }
 
 // The GeometryCollection object contains a array of one or more polygons
@@ -660,4 +712,50 @@ func parseWKTCoordinates(input string) []float64 {
 		coords = append(coords, coord)
 	}
 	return coords
+}
+
+func array4ToWKTCoordinates(input [][][][]float64) string {
+	var result string
+	for inx, three := range input {
+		result = result + "(" + array3ToWKTCoordinates(three) + ")"
+		if inx+1 < len(input) {
+			result = result + ", "
+		}
+	}
+	return result
+}
+
+func array3ToWKTCoordinates(input [][][]float64) string {
+	var result string
+	for inx, two := range input {
+		result = result + "(" + array2ToWKTCoordinates(two) + ")"
+		if inx+1 < len(input) {
+			result = result + ", "
+		}
+	}
+	return result
+}
+
+func array2ToWKTCoordinates(input [][]float64) string {
+	var result string
+	for inx, one := range input {
+		result = result + array1ToWKTCoordinates(one)
+		if inx+1 < len(input) {
+			result = result + ", "
+		}
+	}
+	return result
+}
+
+func array1ToWKTCoordinates(input []float64) string {
+	var result string
+	switch len(input) {
+	case 2:
+		result = fmt.Sprintf("%f %f", input[0], input[1])
+	case 3:
+		result = fmt.Sprintf("%f %f %f", input[0], input[1], input[2])
+	case 4:
+		result = fmt.Sprintf("%f %f %f %f", input[0], input[1], input[2], input[3])
+	}
+	return result
 }

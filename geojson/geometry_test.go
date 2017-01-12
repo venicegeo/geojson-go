@@ -64,5 +64,7 @@ func TestToMultiPoint(t *testing.T) {
 		t.Errorf("Failed to parse file: %v", err)
 	}
 	result = ToMultiPoint(gj)
-	fmt.Printf("Found %v points.\n%#v\n", len(result.Coordinates), result)
+	if len(result.Coordinates) != 10 {
+		t.Errorf("Found %v points, expected 10.\n%#v\n", len(result.Coordinates), result)
+	}
 }

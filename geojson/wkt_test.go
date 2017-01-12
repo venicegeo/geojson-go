@@ -17,7 +17,6 @@ limitations under the License.
 package geojson
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -32,6 +31,15 @@ var inputWKTFiles = [...]string{
 	"test/polygon.wkt",
 	"test/polygon2.wkt",
 	"test/multipoint.wkt"}
+
+var inputFilesForWKT = [...]string{
+	"test/point.geojson",
+	"test/linestring.geojson",
+	"test/polygon.geojson",
+	"test/polygon-hole.geojson",
+	"test/multipoint.geojson",
+	"test/multilinestring.geojson",
+	"test/multipolygon.geojson"}
 
 var outputGeojsons = [...]string{
 	"{\"type\":\"Point\",\"coordinates\":[30,10]}",
@@ -85,13 +93,26 @@ func TestWKT(t *testing.T) {
 		}
 
 		if bytes, err = Write(gj); err != nil {
-			log.Panicf("Write error: %v\n", err)
+			t.Fatalf("Write error: %v\n", err)
 		}
 		output = string(bytes)
-		if output == outputGeojsons[inx] {
-			fmt.Printf("Parsed: %v\nOutput: %v\n", input, output)
-		} else {
+		if output != outputGeojsons[inx] {
 			t.Errorf("Expected: %v\nFound: %v\n", outputGeojsons[inx], output)
 		}
+	}
+}
+func TestWriteWKT(t *testing.T) {
+	for _, fileName := range inputFilesForWKT {
+		if gj, err := ParseFile(fileName); err == nil {
+			switch wkter := gj.(type) {
+			case WKTer:
+				t.Log(wkter.WKT())
+			default:
+				t.Errorf("Unable to produce WKT for %v", fileName)
+			}
+		} else {
+			t.Fatal(err)
+		}
+		t.Fail()
 	}
 }
