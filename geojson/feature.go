@@ -250,7 +250,7 @@ func FeatureFromMap(input map[string]interface{}) *Feature {
 			case string:
 				result.ID = idtype
 			case int:
-				result.ID = strconv.FormatInt(int64(idtype), 10)
+				result.ID = strconv.Itoa(idtype)
 			}
 		}
 		return &result

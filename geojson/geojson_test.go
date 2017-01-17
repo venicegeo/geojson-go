@@ -107,8 +107,7 @@ func TestFromMap(t *testing.T) {
 		t.Errorf("Failed to parse file: %v", err)
 	}
 	featureCollection := gj.(*FeatureCollection)
-	map1 := make(map[string]interface{})
-	map1 = featureCollection.Map()
+	map1 := featureCollection.Map()
 	if FromMap(map1) == nil {
 		t.Errorf("Failed to parse file: %v", err)
 		t.Log(FromMap(map1))
@@ -143,7 +142,7 @@ func testWriteFile(input map[string]interface{}) error {
 func TestNullInputs(t *testing.T) {
 	bb, _ := NewBoundingBox(nil)
 	if "" != bb.String() {
-		fmt.Printf(bb.String())
+		fmt.Print(bb.String())
 		t.Error("Couldn't handle nil bounding box")
 	}
 	point := bb.Centroid()
