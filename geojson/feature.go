@@ -61,7 +61,7 @@ func (feature *Feature) ForceBbox() BoundingBox {
 		return bboxIfc.ForceBbox()
 	}
 
-	log.Printf("Feature %v does not have a Geometry that can be made into a Bounding Box: %t", feature.IDStr(), feature.Geometry)
+	log.Printf("Feature %v does not have a Geometry that can be made into a Bounding Box: %#v", feature.IDStr(), feature.Geometry)
 	return BoundingBox{}
 }
 
