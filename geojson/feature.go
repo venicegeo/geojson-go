@@ -57,10 +57,10 @@ func (feature *Feature) ForceBbox() BoundingBox {
 	if len(feature.Bbox) > 0 {
 		return feature.Bbox
 	}
+	feature.ResolveGeometry()
 	if bboxIfc, ok := feature.Geometry.(BoundingBoxIfc); ok {
 		return bboxIfc.ForceBbox()
 	}
-
 	log.Printf("Feature %v does not have a Geometry that can be made into a Bounding Box: %#v", feature.IDStr(), feature.Geometry)
 	return BoundingBox{}
 }
