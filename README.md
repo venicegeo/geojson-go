@@ -18,3 +18,4 @@ There are other GeoJSON Go libraries out there. This library handles any GeoJSON
 ### What does it not do well?
 1. It is not designed to validate input. The library assumes that the input is valid GeoJSON. Behavior for invalid GeoJSON is undefined and could panic.
 2. Foreign members are not supported. If your GeoJSON input has predictable foreign members, the best thing to do is to unmarshal them into a separate struct from the GeoJSON object.
+
