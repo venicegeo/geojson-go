@@ -60,10 +60,20 @@ func NewBoundingBox(input interface{}) (BoundingBox, error) {
 		case 0, 1:
 			// No op
 		case 2:
-			result = append(inputType, inputType[:]...)
+			result = []float64{
+				inputType[0],
+				inputType[1],
+				inputType[0],
+				inputType[1]}
 			// Drop extraneous coordinates like measurements that do not pertain to BBoxes
 		default:
-			result = append(inputType[0:3], inputType[0:3]...)
+			result = []float64{
+				inputType[0],
+				inputType[1],
+				inputType[2],
+				inputType[0],
+				inputType[1],
+				inputType[2]}
 		}
 	case [][]float64:
 		for _, curr := range inputType {
