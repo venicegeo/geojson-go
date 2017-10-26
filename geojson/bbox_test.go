@@ -213,3 +213,48 @@ func testBBox(t *testing.T, fileName string) {
 		t.Errorf("Bounding box for %v is empty: %v", fileName, gj.(fmt.Stringer).String())
 	}
 }
+
+func TestBboxParseNoSideEffects(t *testing.T) {
+	checkInputUnchanged := func(expected []float64, actual []float64) {
+		if len(expected) != len(actual) {
+			t.Errorf("Bounding box constructor changed input data size; Expected: %d; Actual: %d", len(expected), len(actual))
+		} else {
+			for i := range expected {
+				if expected[i] != actual[i] {
+					t.Errorf("Bounding box constructor modified input data; Expected: %v; Actual: %v", expected, actual)
+					break
+				}
+			}
+		}
+	}
+	var originalData, passedInData []float64
+
+	// Tests for invalid (too few) valid
+	originalData = []float64{}
+	passedInData = append([]float64{}, originalData...)
+	NewBoundingBox(passedInData)
+	checkInputUnchanged(originalData, passedInData)
+
+	originalData = []float64{1}
+	passedInData = append([]float64{}, originalData...)
+	NewBoundingBox(passedInData)
+	checkInputUnchanged(originalData, passedInData)
+
+	// Test for two values
+	originalData = []float64{1, 2}
+	passedInData = append([]float64{}, originalData...)
+	NewBoundingBox(passedInData)
+	checkInputUnchanged(originalData, passedInData)
+
+	// Test for three values
+	originalData = []float64{1, 2, 3}
+	passedInData = append([]float64{}, originalData...)
+	NewBoundingBox(passedInData)
+	checkInputUnchanged(originalData, passedInData)
+
+	// Test for three values plus extraneous data
+	originalData = []float64{1, 2, 3, 4, 5, 6, 7}
+	passedInData = append([]float64{}, originalData...)
+	NewBoundingBox(passedInData)
+	checkInputUnchanged(originalData, passedInData)
+}
