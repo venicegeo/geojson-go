@@ -5,6 +5,23 @@ node {
     def mvn = tool 'M3'
     def golangTool = tool 'golang_1.7'
     def appvers = ""
+	
+  stage("Config") {
+    // clone the configuration repository and copy the current configuration
+    def configDir = "${root}/configuration"
+    def configFile = "${root}/config.json"
+    dir(configDir) {
+      git url: "${env.CONFIGURATION_URL}", credentialsId: "${env.CONFIGURATION_CREDS}"
+      sh "mv ${configDir}/${ENVIRONMENT}-config.json ${configFile}"
+      deleteDir()
+    }
+    // read the current configuration
+    def configJson = readJSON file: "${configFile}"
+    for (param in configJson.credparams + configJson.jobparams) { 
+      env."${param.name}" = (param.type == "booleanParam") ? "${param.defaultvalue}".toBoolean() : "${param.defaultvalue}"
+    }
+  }
+	
     stage("Setup") {
         deleteDir()
         withEnv([
@@ -18,7 +35,7 @@ node {
             """
         }
         dir("${root}/gopath/src/github.com/venicegeo/geojson-go") {
-            if(env.GITLAB_CREDS) {
+            if(env.USE_GIT_CREDS) {
                 git url: "${env.GIT_URL}", branch: "${env.GIT_BRANCH}", credentialsId: "${env.GITLAB_CREDS}"
             } else {
                 git url: "${env.GIT_URL}", branch: "${env.GIT_BRANCH}"
