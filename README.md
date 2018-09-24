@@ -1,4 +1,5 @@
 # geojson-go
+[![Go Report Card](https://goreportcard.com/badge/github.com/venicegeo/geojson-go)](https://goreportcard.com/report/github.com/venicegeo/geojson-go)
 
 ## Overview
 
