@@ -132,3 +132,29 @@ func TestRTFeature(t *testing.T) {
 		t.Errorf("Round trip feature failed: %v", f2.String())
 	}
 }
+
+func TestFeatureMarshalEmptyProperties(t *testing.T) {
+	var (
+		gj          interface{}
+		err         error
+		resultEmpty = `{"type":"Feature","geometry":{"type":"LineString","coordinates":[[102,0],[103,1],[104,0],[105,1]]},"properties":{},"id":98765}`
+		resultNil   = `{"type":"Feature","geometry":{"type":"LineString","coordinates":[[102,0],[103,1],[104,0],[105,1]]},"properties":null,"id":98765}`
+	)
+
+	if gj, err = ParseFile("test/feature.geojson"); err != nil {
+		t.Errorf("Failed to parse file: %v", err)
+	}
+	f := gj.(*Feature)
+
+	// Test empty properties map
+	f.Properties = map[string]interface{}{}
+	if f.String() != resultEmpty {
+		t.Errorf("Empty properties did not output an empty object: %v", f.String())
+	}
+
+	// Test nil properties map
+	f.Properties = nil
+	if f.String() != resultNil {
+		t.Errorf("Nil properties did not output an empty object: %v", f.String())
+	}
+}

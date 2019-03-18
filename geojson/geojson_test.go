@@ -154,11 +154,11 @@ func TestNullInputs(t *testing.T) {
 		t.Errorf("Received %v for empty Feature Collection.", fc.String())
 	}
 	f := NewFeature(nil, nil, nil)
-	if f.String() != `{"type":"Feature","geometry":null}` {
+	if f.String() != `{"type":"Feature","geometry":null,"properties":{}}` {
 		t.Errorf("Received %v for an empty Feature.", f.String())
 	}
 	fc.Features = append(fc.Features, f)
-	if fc.String() != `{"type":"FeatureCollection","features":[{"type":"Feature","geometry":null}]}` {
+	if fc.String() != `{"type":"FeatureCollection","features":[{"type":"Feature","geometry":null,"properties":{}}]}` {
 		t.Errorf("Received %v for a feature collection with a single empty feature", fc.String())
 	}
 }

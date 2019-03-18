@@ -36,7 +36,7 @@ const (
 type Feature struct {
 	Type       string                 `json:"type"`
 	Geometry   interface{}            `json:"geometry"`
-	Properties map[string]interface{} `json:"properties,omitempty"`
+	Properties map[string]interface{} `json:"properties"`
 	ID         interface{}            `json:"id,omitempty"`
 	Bbox       BoundingBox            `json:"bbox,omitempty"`
 }
