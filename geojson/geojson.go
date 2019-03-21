@@ -18,6 +18,7 @@ package geojson
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -29,13 +30,22 @@ const (
 
 // Parse parses a GeoJSON string into a GeoJSON object pointer
 func Parse(bytes []byte) (result interface{}, err error) {
-	var gj map[string]interface{}
-
 	defer func() {
 		if r := recover(); r != nil {
-			err = r.(error)
+			if parseErr, ok := r.(error); ok {
+				err = parseErr
+			} else {
+				err = fmt.Errorf("unexpected panic: %v", r)
+			}
 		}
 	}()
+	return parsePanicUnsafe(bytes)
+}
+
+// parsePanicUnsafe is the place Parse actually does its work,
+// but is implemented as a variable for stubbing in testing panic safety
+var parsePanicUnsafe = func(bytes []byte) (result interface{}, err error) {
+	var gj map[string]interface{}
 
 	if err = json.Unmarshal(bytes, &gj); err != nil {
 		return nil, err
