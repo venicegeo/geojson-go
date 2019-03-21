@@ -28,12 +28,15 @@ const (
 )
 
 // Parse parses a GeoJSON string into a GeoJSON object pointer
-func Parse(bytes []byte) (interface{}, error) {
-	var (
-		result interface{}
-		gj     map[string]interface{}
-		err    error
-	)
+func Parse(bytes []byte) (result interface{}, err error) {
+	var gj map[string]interface{}
+
+	defer func() {
+		if r := recover(); r != nil {
+			err = r.(error)
+		}
+	}()
+
 	if err = json.Unmarshal(bytes, &gj); err != nil {
 		return nil, err
 	}
