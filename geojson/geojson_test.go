@@ -17,8 +17,10 @@ limitations under the License.
 package geojson
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"testing"
 )
 
@@ -160,5 +162,41 @@ func TestNullInputs(t *testing.T) {
 	fc.Features = append(fc.Features, f)
 	if fc.String() != `{"type":"FeatureCollection","features":[{"type":"Feature","geometry":null,"properties":{}}]}` {
 		t.Errorf("Received %v for a feature collection with a single empty feature", fc.String())
+	}
+}
+
+func TestParseCatchPanics(t *testing.T) {
+	var err error
+	parsePanicUnsafeOriginal := parsePanicUnsafe
+	defer func() {
+		parsePanicUnsafe = parsePanicUnsafeOriginal
+	}()
+
+	parsePanicUnsafe = func([]byte) (interface{}, error) {
+		panic("test panic string")
+	}
+
+	_, err = Parse([]byte("test bytes"))
+	if err == nil {
+		t.Error("Expected error, received nil")
+	}
+	if !strings.HasPrefix(err.Error(), "unexpected panic:") || !strings.Contains(err.Error(), "test panic string") {
+		// Should be prefixed with "unexpected panic"
+		// Should contain "test panic string"
+		t.Errorf("Unexpected error in response to a panic: %v", err)
+	}
+
+	parsePanicUnsafe = func([]byte) (interface{}, error) {
+		panic(errors.New("test panic error"))
+	}
+
+	_, err = Parse([]byte("test bytes"))
+	if err == nil {
+		t.Error("Expected error, received nil")
+	}
+	if strings.HasPrefix(err.Error(), "unexpected panic:") || !strings.Contains(err.Error(), "test panic error") {
+		// Should NOT be prefixed with "unexpected panic"
+		// Should contain "test panic error"
+		t.Errorf("Unexpected error in response to a panic: %v", err)
 	}
 }
